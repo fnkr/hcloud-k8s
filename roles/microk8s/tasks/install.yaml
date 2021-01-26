@@ -1,0 +1,52 @@
+- name: Create host entries for other microk8s nodes
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} microk8s nodes"
+    block: |
+      {% for host in ansible_play_hosts_all|reject('eq', inventory_hostname) %}
+      {{ hostvars[host].ansible_all_ipv4_addresses|ipaddr(cluster_network_ip_range)|first }} {{ hostvars[host].ansible_hostname }}
+      {% endfor %}
+
+- name: Refresh apt cache
+  apt:
+    update_cache: true
+
+- name: Install snapd
+  apt:
+    name: snapd
+
+- name: Install microk8s
+  snap:
+    name: microk8s
+    classic: true
+  register: microk8s_install_result
+
+- name: Wait until microk8s is ready
+  command: microk8s status --wait-ready
+  changed_when: false
+
+- name: Wait until microk8s is really ready
+  when: microk8s_install_result.changed
+  wait_for:
+    timeout: 600
+
+- loop: "{{ [inventory_hostname] if inventory_hostname != ansible_play_hosts_all|first else [] }}"
+  when: microk8s_install_result.changed
+  include_tasks: add_node.yaml
+
+- name: Wait until microk8s is ready
+  when: microk8s_install_result.changed
+  wait_for:
+    timeout: 600
+
+- name: Enable microk8s addons
+  loop: "{{ microk8s_addons if inventory_hostname == ansible_play_hosts_all|first else [] }}"
+  environment:
+    LC_ALL: en_US.utf-8
+    LANG: en_US.utf-8
+  shell: |
+    set -e
+    microk8s enable {{ item|quote }}
+    touch /var/snap/microk8s/common/.ansible-enabled-{{ item.split(':')[0]|quote }}
+  args:
+    creates: "/var/snap/microk8s/common/.ansible-enabled-{{ item }}"
