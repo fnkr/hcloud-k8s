@@ -37,12 +37,12 @@ resource "hcloud_network_subnet" "network_subnet" {
 
 resource "hcloud_server" "node" {
   count       = var.cluster_node_count
-  name        = "${var.cluster_name}-node-${count.index+1}"
+  name        = "${var.cluster_name}-node-${count.index + 1}"
   image       = var.cluster_node_image
   server_type = split(",", var.cluster_node_types)[count.index]
   location    = split(",", var.cluster_node_locations)[count.index]
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
-  labels      = {"${var.cluster_node_label_name}": var.cluster_name}
+  labels      = { "${var.cluster_node_label_name}" : var.cluster_name }
 
   connection {
     type = "ssh"
@@ -62,8 +62,8 @@ resource "hcloud_server" "node" {
 }
 
 resource "hcloud_server_network" "node_network" {
-  count = var.cluster_node_count
-  server_id = hcloud_server.node[count.index].id
+  count      = var.cluster_node_count
+  server_id  = hcloud_server.node[count.index].id
   network_id = hcloud_network.network.id
 }
 
@@ -79,7 +79,7 @@ resource "hcloud_load_balancer" "loadbalancer" {
 
 resource "hcloud_load_balancer_network" "loadbalancer_network" {
   load_balancer_id = hcloud_load_balancer.loadbalancer.id
-  network_id = hcloud_network.network.id
+  network_id       = hcloud_network.network.id
 }
 
 resource "hcloud_load_balancer_target" "loadbalancer_target" {
@@ -91,15 +91,15 @@ resource "hcloud_load_balancer_target" "loadbalancer_target" {
 
 resource "hcloud_load_balancer_service" "loadbalancer_service_http" {
   load_balancer_id = hcloud_load_balancer.loadbalancer.id
-  protocol = "tcp"
-  listen_port = 80
+  protocol         = "tcp"
+  listen_port      = 80
   destination_port = 80
 }
 
 resource "hcloud_load_balancer_service" "loadbalancer_service_https" {
   load_balancer_id = hcloud_load_balancer.loadbalancer.id
-  protocol = "tcp"
-  listen_port = 443
+  protocol         = "tcp"
+  listen_port      = 443
   destination_port = 443
 }
 
