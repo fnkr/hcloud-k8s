@@ -49,4 +49,4 @@
     microk8s enable {{ item|quote }}
     touch /var/snap/microk8s/common/.ansible-enabled-{{ item.split(':')[0]|quote }}
   args:
-    creates: "/var/snap/microk8s/common/.ansible-enabled-{{ item }}"
+    creates: "/var/snap/microk8s/common/.ansible-enabled-{{ item.split(':')[0] }}"
