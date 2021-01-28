@@ -10,6 +10,8 @@ variable "cluster_node_types" {}
 variable "cluster_node_locations" {}
 variable "cluster_network_zone" {}
 variable "cluster_network_ip_range" {}
+variable "cluster_network_ip_range_node" {}
+variable "cluster_network_ip_range_loadbalancer" {}
 variable "cluster_loadbalancer_type" {}
 variable "cluster_loadbalancer_location" {}
 
@@ -28,11 +30,18 @@ resource "hcloud_network" "network" {
   ip_range = var.cluster_network_ip_range
 }
 
-resource "hcloud_network_subnet" "network_subnet" {
+resource "hcloud_network_subnet" "network_subnet_node" {
   type         = "cloud"
   network_id   = hcloud_network.network.id
   network_zone = "eu-central"
-  ip_range     = var.cluster_network_ip_range
+  ip_range     = var.cluster_network_ip_range_node
+}
+
+resource "hcloud_network_subnet" "network_subnet_loadbalancer" {
+  type         = "cloud"
+  network_id   = hcloud_network.network.id
+  network_zone = "eu-central"
+  ip_range     = var.cluster_network_ip_range_loadbalancer
 }
 
 resource "hcloud_server" "node" {
@@ -65,6 +74,7 @@ resource "hcloud_server_network" "node_network" {
   count      = var.cluster_node_count
   server_id  = hcloud_server.node[count.index].id
   network_id = hcloud_network.network.id
+  ip         = cidrhost(var.cluster_network_ip_range_node, count.index + 1)
 }
 
 resource "hcloud_load_balancer" "loadbalancer" {
@@ -80,6 +90,7 @@ resource "hcloud_load_balancer" "loadbalancer" {
 resource "hcloud_load_balancer_network" "loadbalancer_network" {
   load_balancer_id = hcloud_load_balancer.loadbalancer.id
   network_id       = hcloud_network.network.id
+  ip               = cidrhost(var.cluster_network_ip_range_loadbalancer, 1)
 }
 
 resource "hcloud_load_balancer_target" "loadbalancer_target" {
