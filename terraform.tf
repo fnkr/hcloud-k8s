@@ -105,6 +105,20 @@ resource "hcloud_load_balancer_service" "loadbalancer_service_http" {
   protocol         = "tcp"
   listen_port      = 80
   destination_port = 80
+
+  health_check {
+    protocol = "http"
+    port     = 16443
+    interval = 10
+    timeout  = 5
+    retries  = 3
+    http {
+      tls          = true
+      path         = "/livez"
+      response     = "Unauthorized"
+      status_codes = ["401"]
+    }
+  }
 }
 
 resource "hcloud_load_balancer_service" "loadbalancer_service_https" {
@@ -112,6 +126,20 @@ resource "hcloud_load_balancer_service" "loadbalancer_service_https" {
   protocol         = "tcp"
   listen_port      = 443
   destination_port = 443
+
+  health_check {
+    protocol = "http"
+    port     = 16443
+    interval = 10
+    timeout  = 5
+    retries  = 3
+    http {
+      tls          = true
+      path         = "/livez"
+      response     = "Unauthorized"
+      status_codes = ["401"]
+    }
+  }
 }
 
 output "node_names" {
