@@ -51,7 +51,7 @@ resource "hcloud_server" "node" {
   server_type = split(",", var.cluster_node_types)[count.index]
   location    = split(",", var.cluster_node_locations)[count.index]
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
-  labels      = { "${var.cluster_node_label_name}" : var.cluster_name }
+  labels      = { (var.cluster_node_label_name) : var.cluster_name }
 
   connection {
     type = "ssh"
