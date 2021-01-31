@@ -98,6 +98,10 @@ resource "hcloud_load_balancer_target" "loadbalancer_target" {
   load_balancer_id = hcloud_load_balancer.loadbalancer.id
   label_selector   = "${var.cluster_node_label_name}=${var.cluster_name}"
   use_private_ip   = true
+
+  depends_on = [
+    hcloud_load_balancer_network.loadbalancer_network
+  ]
 }
 
 resource "hcloud_load_balancer_service" "loadbalancer_service_http" {
