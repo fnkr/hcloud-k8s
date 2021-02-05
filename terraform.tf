@@ -118,7 +118,7 @@ resource "hcloud_load_balancer_service" "loadbalancer_service_http" {
     retries  = 3
     http {
       tls          = true
-      path         = "/livez"
+      path         = "/readyz"
       response     = "Unauthorized"
       status_codes = ["401"]
     }
@@ -139,7 +139,7 @@ resource "hcloud_load_balancer_service" "loadbalancer_service_https" {
     retries  = 3
     http {
       tls          = true
-      path         = "/livez"
+      path         = "/readyz"
       response     = "Unauthorized"
       status_codes = ["401"]
     }
