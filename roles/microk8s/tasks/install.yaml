@@ -39,6 +39,17 @@
   wait_for:
     timeout: 600
 
+- name: Create symlinks for k8s compatibility
+  loop:
+    - link: /var/lib/kubelet/plugins
+      dest: /var/snap/microk8s/common/var/lib/kubelet/plugins
+    - link: /var/lib/kubelet/plugins_registry
+      dest: /var/snap/microk8s/common/var/lib/kubelet/plugins_registry
+  file:
+    state: link
+    src: "{{ item.dest }}"
+    dest: "{{ item.link }}"
+
 - name: Enable microk8s addons
   loop: "{{ microk8s_addons if inventory_hostname == ansible_play_hosts_all|first else [] }}"
   environment:
