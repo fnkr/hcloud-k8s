@@ -1,0 +1,25 @@
+- when: inventory_hostname == k8s_initializer
+  block:
+    - name: Initialize K8s cluster
+      args:
+        executable: bash
+        creates: /etc/kubernetes/admin.conf
+      shell: >
+        kubeadm init
+        --kubernetes-version=v{{ k8s_version|quote }}
+        --node-name={{ inventory_hostname|quote }}
+        --pod-network-cidr={{ k8s_ip_range_pod|quote }}
+        --service-cidr={{ k8s_ip_range_service|quote }}
+        --token-ttl=10m
+        --control-plane-endpoint={{ k8s_control_plane_endpoint|quote }}
+        {% for san in k8s_apiserver_cert_extra_sans %}--apiserver-cert-extra-sans={{ san|quote }}{% if not loop.last %} {% endif %}{% endfor %}
+      register: k8s_cluster_init_result
+      any_errors_fatal: true
+
+    - name: Configure kube tools
+      args:
+        creates: "{{ ansible_env.HOME }}/.kube/config"
+      shell: |
+        set -e
+        mkdir -p -- ~/.kube
+        cp /etc/kubernetes/admin.conf ~/.kube/config

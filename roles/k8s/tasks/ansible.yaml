@@ -1,0 +1,9 @@
+- when: inventory_hostname == k8s_initializer
+  block:
+    - name: Install pip
+      apt:
+        name: python3-pip
+
+    - name: Install openshift
+      pip:
+        name: openshift

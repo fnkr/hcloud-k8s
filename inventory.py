@@ -2,38 +2,85 @@
 import json
 import subprocess
 
+
 def get_terraform_output():
-    return json.loads(subprocess.check_output(["terraform", "output", "-json"]).decode('utf-8'))
+    return json.loads(
+        subprocess.check_output(["terraform", "output", "-json"]).decode("utf-8")
+    )
+
 
 def build_inventory(terraform_output):
     inventory = {
-        '_meta': {
-            'hostvars': {},
+        "_meta": {
+            "hostvars": {},
         },
-        'all': {
-            'hosts': [],
-            'children': ['node'],
-            'vars': {},
+        "all": {
+            "children": ["node"],
         },
-        'node': {
-            'hosts': [],
+        "node": {
+            "children": ["controlnode", "workernode"],
+            "vars": {},
+        },
+        "controlnode": {
+            "hosts": [],
+        },
+        "workernode": {
+            "hosts": [],
         },
     }
 
     terraform_output = get_terraform_output()
-    node_names = terraform_output['node_names']['value']
-    node_ipv4_addresses = terraform_output['node_ipv4_addresses']['value']
-    inventory['all']['vars']['cluster_network_ip_range'] = terraform_output['cluster_network_ip_range']['value']
 
-    for node in range(len(node_names)):
-        node_name = node_names[node]
-        inventory['_meta']['hostvars'][node_name] = {
-            'ansible_host': node_ipv4_addresses[node],
-        }
-        inventory['all']['hosts'].append(node_name)
-        inventory['node']['hosts'].append(node_name)
+    # fmt: off
+    inventory["node"]["vars"]["k8s_hcloud_token"] = \
+        terraform_output["hcloud_token"]["value"]
+
+    inventory["node"]["vars"]["k8s_cluster_name"] = \
+        terraform_output["cluster_name"]["value"]
+
+    inventory["node"]["vars"]["k8s_ip_range_node"] = \
+        terraform_output["cluster_network_ip_range_node"]["value"]
+
+    inventory["node"]["vars"]["k8s_ip_range_controlnode"] = \
+        terraform_output["cluster_network_ip_range_controlnode"]["value"]
+
+    inventory["node"]["vars"]["k8s_ip_range_pod"] = \
+        terraform_output["cluster_network_ip_range_pod"]["value"]
+
+    inventory["node"]["vars"]["k8s_ip_range_service"] = \
+        terraform_output["cluster_network_ip_range_service"]["value"]
+
+    inventory["node"]["vars"]["k8s_control_plane_endpoint"] = \
+        terraform_output["controllb_private_k8s_endpoint"]["value"]
+
+    inventory["node"]["vars"]["k8s_apiserver_cert_extra_sans"] = \
+        [terraform_output["controllb_ipv4_address"]["value"]]
+    # fmt: on
+
+    for group in [
+        [
+            terraform_output["controlnode_names"]["value"],
+            terraform_output["controlnode_ipv4_addresses"]["value"],
+            "controlnode",
+        ],
+        [
+            terraform_output["workernode_names"]["value"],
+            terraform_output["workernode_ipv4_addresses"]["value"],
+            "workernode",
+        ],
+    ]:
+        for node in range(len(group[0])):
+            node_name = group[0][node]
+            node_ipv4_address = group[1][node]
+            node_group = group[2]
+
+            inventory["_meta"]["hostvars"][node_name] = {
+                "ansible_host": node_ipv4_address,
+            }
+            inventory[node_group]["hosts"].append(node_name)
 
     return inventory
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print(json.dumps(build_inventory(get_terraform_output())))

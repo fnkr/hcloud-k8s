@@ -1,0 +1,9 @@
+- when: inventory_hostname == k8s_initializer
+  block:
+    - name: Install hcloud-csi
+      loop:
+        - hcloud-csi-secrets.yaml
+        - hcloud-csi.yaml
+      k8s:
+        inline: |
+          {{ lookup('template', 'hcloud-csi/' + item) }}

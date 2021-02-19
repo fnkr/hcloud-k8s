@@ -1,0 +1,14 @@
+- when: inventory_hostname == k8s_initializer
+  block:
+    - name: Install nginx ingress
+      loop:
+        - ingress-nginx.yaml
+      k8s:
+        namespace: kube-ingress-nginx
+        inline: |
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: kube-ingress-nginx
+          ---
+          {{ lookup('template', 'ingress-nginx/' + item) }}

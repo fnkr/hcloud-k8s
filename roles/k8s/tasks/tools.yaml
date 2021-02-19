@@ -1,0 +1,5 @@
+- name: Install kubeadm and kubectl
+  apt:
+    name:
+      - kubeadm={{ k8s_version }}-00
+      - kubectl={{ k8s_version }}-00

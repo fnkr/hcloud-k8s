@@ -1,0 +1,14 @@
+- name: Add K8s package signing key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Add K8s repository
+  apt_repository:
+    filename: k8s
+    repo: deb https://packages.cloud.google.com/apt/ kubernetes-xenial main
+  register: k8s_add_repository_result
+
+- name: Refresh apt cache
+  when: k8s_add_repository_result.changed
+  apt:
+    update_cache: true

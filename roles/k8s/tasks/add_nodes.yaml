@@ -1,0 +1,39 @@
+- name: Check if node is initialized
+  when: inventory_hostname != k8s_initializer
+  stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: k8s_node_initialized_result
+
+- when: inventory_hostname == k8s_initializer
+  block:
+    - name: Create token to add controller nodes to cluster
+      when: |
+        ansible_play_hosts|select('in', k8s_controlnodes)|reject('eq', k8s_initializer)|map('extract', hostvars)|map(attribute='k8s_node_initialized_result.stat.exists')|select('eq', false)|length > 0
+      args:
+        executable: bash
+      shell: |
+        kubeadm token create --ttl=2h --print-join-command --certificate-key="$(kubeadm init phase upload-certs --upload-certs | tail -n 1)"
+      register: k8s_join_controller_command_result
+
+    - name: Create token to add worker nodes to cluster
+      when: |
+        ansible_play_hosts|select('in', k8s_workernodes)|map('extract', hostvars)|map(attribute='k8s_node_initialized_result.stat.exists')|select('eq', false)|length > 0
+      args:
+        executable: bash
+      shell: |
+        kubeadm token create --ttl=2h --print-join-command
+      register: k8s_join_worker_command_result
+
+- when:
+    - inventory_hostname != k8s_initializer
+    - not k8s_node_initialized_result.stat.exists
+  block:
+    - name: Add controller nodes to cluster
+      throttle: 1
+      when: inventory_hostname in k8s_controlnodes
+      shell: "{{ hostvars[k8s_initializer].k8s_join_controller_command_result.stdout }}"
+
+    - name: Add worker nodes to cluster
+      throttle: 1
+      when: inventory_hostname in k8s_workernodes
+      shell: "{{ hostvars[k8s_initializer].k8s_join_worker_command_result.stdout }}"

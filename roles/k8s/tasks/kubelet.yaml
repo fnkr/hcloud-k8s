@@ -1,0 +1,29 @@
+- name: Create drop-in directory for kubelet service
+  file:
+    path: /etc/systemd/system/kubelet.service.d
+    state: directory
+
+- name: Template kubelet service overrides
+  copy:
+    content: |
+      [Service]
+      Environment=KUBELET_EXTRA_ARGS=--cloud-provider=external
+    dest: /etc/systemd/system/kubelet.service.d/ansible.conf
+
+- name: Install kubelet
+  apt:
+    name: "kubelet={{ k8s_version }}-00"
+  register: k8s_install_kubelet_result
+
+- name: Restart kubelet
+  when: k8s_install_kubelet_result.changed
+  systemd:
+    daemon_reload: true
+    name: kubelet
+    state: restarted
+
+- name: Enable and start kubelet
+  systemd:
+    name: kubelet
+    state: started
+    enabled: true

@@ -1,0 +1,11 @@
+- import_tasks: repository.yaml
+- import_tasks: docker.yaml
+- import_tasks: kubelet.yaml
+- import_tasks: tools.yaml
+- import_tasks: initialize.yaml
+- import_tasks: ansible.yaml
+- import_tasks: hcloud_ccm.yaml
+- import_tasks: hcloud_csi.yaml
+- import_tasks: cilium.yaml
+- import_tasks: ingress-nginx.yaml
+- import_tasks: add_nodes.yaml

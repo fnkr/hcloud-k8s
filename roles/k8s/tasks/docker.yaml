@@ -1,0 +1,10 @@
+- name: Install Docker
+  apt:
+    name: docker.io
+
+- name: Enable and start Docker
+  systemd:
+    daemon_reload: true
+    name: docker
+    state: started
+    enabled: true
