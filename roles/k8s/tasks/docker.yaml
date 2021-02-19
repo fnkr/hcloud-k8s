@@ -6,5 +6,5 @@
   systemd:
     daemon_reload: true
     name: docker
-    state: started
     enabled: true
+    state: started

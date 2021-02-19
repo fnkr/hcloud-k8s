@@ -14,15 +14,17 @@ variable "cluster_workernode_locations" {}
 variable "cluster_network_zone" {}
 variable "cluster_network_ip_range" {}
 variable "cluster_network_ip_range_loadbalancer" {}
-variable "cluster_network_ip_range_node" {}
 variable "cluster_network_ip_range_controlnode" {}
 variable "cluster_network_ip_range_workernode" {}
-variable "cluster_network_ip_range_pod" {}
 variable "cluster_network_ip_range_service" {}
+variable "cluster_network_ip_range_pod" {}
 variable "cluster_controllb_type" {}
 variable "cluster_controllb_location" {}
+variable "cluster_controllb_listen_port" {}
 variable "cluster_workerlb_type" {}
 variable "cluster_workerlb_location" {}
+variable "cluster_ingress" {}
+variable "cluster_cni" {}
 
 variable "cluster_node_image" {
   type    = string
@@ -168,7 +170,7 @@ resource "hcloud_load_balancer_target" "controllb_target" {
 resource "hcloud_load_balancer_service" "controllb_service_https" {
   load_balancer_id = hcloud_load_balancer.controllb.id
   protocol         = "tcp"
-  listen_port      = 443
+  listen_port      = var.cluster_controllb_listen_port
   destination_port = 6443
 
   health_check {
@@ -284,20 +286,12 @@ output "workernode_ipv4_addresses" {
   value = hcloud_server.workernode.*.ipv4_address
 }
 
-output "cluster_network_ip_range_node" {
-  value = var.cluster_network_ip_range_node
-}
-
-output "cluster_network_ip_range_controlnode" {
-  value = var.cluster_network_ip_range_controlnode
+output "cluster_network_ip_range_service" {
+  value = var.cluster_network_ip_range_service
 }
 
 output "cluster_network_ip_range_pod" {
   value = var.cluster_network_ip_range_pod
-}
-
-output "cluster_network_ip_range_service" {
-  value = var.cluster_network_ip_range_service
 }
 
 output "controllb_ipv4_address" {
@@ -306,4 +300,12 @@ output "controllb_ipv4_address" {
 
 output "controllb_private_k8s_endpoint" {
   value = "${hcloud_load_balancer_network.controllb_network.ip}:${hcloud_load_balancer_service.controllb_service_https.listen_port}"
+}
+
+output "cluster_ingress" {
+  value = var.cluster_ingress
+}
+
+output "cluster_cni" {
+  value = var.cluster_cni
 }

@@ -1,6 +1,6 @@
 - hosts: node
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   tags:
     - k8s
   roles:

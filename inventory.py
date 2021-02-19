@@ -38,23 +38,23 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_cluster_name"] = \
         terraform_output["cluster_name"]["value"]
 
-    inventory["node"]["vars"]["k8s_ip_range_node"] = \
-        terraform_output["cluster_network_ip_range_node"]["value"]
-
-    inventory["node"]["vars"]["k8s_ip_range_controlnode"] = \
-        terraform_output["cluster_network_ip_range_controlnode"]["value"]
+    inventory["node"]["vars"]["k8s_ip_range_service"] = \
+        terraform_output["cluster_network_ip_range_service"]["value"]
 
     inventory["node"]["vars"]["k8s_ip_range_pod"] = \
         terraform_output["cluster_network_ip_range_pod"]["value"]
-
-    inventory["node"]["vars"]["k8s_ip_range_service"] = \
-        terraform_output["cluster_network_ip_range_service"]["value"]
 
     inventory["node"]["vars"]["k8s_control_plane_endpoint"] = \
         terraform_output["controllb_private_k8s_endpoint"]["value"]
 
     inventory["node"]["vars"]["k8s_apiserver_cert_extra_sans"] = \
         [terraform_output["controllb_ipv4_address"]["value"]]
+
+    inventory["node"]["vars"]["k8s_ingress"] = \
+        terraform_output["cluster_ingress"]["value"]
+
+    inventory["node"]["vars"]["k8s_cni"] = \
+        terraform_output["cluster_cni"]["value"]
     # fmt: on
 
     for group in [
