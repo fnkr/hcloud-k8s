@@ -5,3 +5,5 @@ controller:
     type: ""
   config:
     use-proxy-protocol: true
+    hsts-max-age: 63072000
+    hsts-include-subdomains: false

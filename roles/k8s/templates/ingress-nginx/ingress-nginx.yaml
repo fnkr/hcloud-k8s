@@ -26,6 +26,10 @@ metadata:
   name: kube-ingress-nginx-controller
 data:
     
+  hsts-include-subdomains: "false"
+    
+  hsts-max-age: "6.3072e+07"
+    
   use-proxy-protocol: "true"
 ---
 # Source: ingress-nginx/templates/clusterrole.yaml
