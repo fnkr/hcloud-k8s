@@ -25,6 +25,8 @@ metadata:
     app.kubernetes.io/component: controller
   name: kube-ingress-nginx-controller
 data:
+    
+  use-proxy-protocol: "true"
 ---
 # Source: ingress-nginx/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1

@@ -224,19 +224,14 @@ resource "hcloud_load_balancer_service" "workerlb_service_http" {
   protocol         = "tcp"
   listen_port      = 80
   destination_port = 80
+  proxyprotocol    = true
 
   health_check {
-    protocol = "http"
-    port     = 10250
+    protocol = "tcp"
+    port     = 80
     interval = 10
     timeout  = 5
     retries  = 3
-    http {
-      tls          = true
-      path         = "/healthz"
-      response     = "Unauthorized"
-      status_codes = ["401"]
-    }
   }
 }
 
@@ -245,19 +240,14 @@ resource "hcloud_load_balancer_service" "workerlb_service_https" {
   protocol         = "tcp"
   listen_port      = 443
   destination_port = 443
+  proxyprotocol    = true
 
   health_check {
-    protocol = "http"
-    port     = 10250
+    protocol = "tcp"
+    port     = 443
     interval = 10
     timeout  = 5
     retries  = 3
-    http {
-      tls          = true
-      path         = "/healthz"
-      response     = "Unauthorized"
-      status_codes = ["401"]
-    }
   }
 }
 

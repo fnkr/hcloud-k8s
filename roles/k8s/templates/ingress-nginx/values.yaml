@@ -3,3 +3,5 @@ controller:
   hostNetwork: true
   service:
     type: ""
+  config:
+    use-proxy-protocol: true
