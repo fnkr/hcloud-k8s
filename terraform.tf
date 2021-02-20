@@ -288,6 +288,10 @@ output "controllb_ipv4_address" {
   value = hcloud_load_balancer.controllb.ipv4
 }
 
+output "controllb_k8s_endpoint" {
+  value = "${hcloud_load_balancer.controllb.ipv4}:${hcloud_load_balancer_service.controllb_service_https.listen_port}"
+}
+
 output "controllb_private_k8s_endpoint" {
   value = "${hcloud_load_balancer_network.controllb_network.ip}:${hcloud_load_balancer_service.controllb_service_https.listen_port}"
 }

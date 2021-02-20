@@ -45,6 +45,9 @@ def build_inventory(terraform_output):
         terraform_output["cluster_network_ip_range_pod"]["value"]
 
     inventory["node"]["vars"]["k8s_control_plane_endpoint"] = \
+        terraform_output["controllb_k8s_endpoint"]["value"]
+
+    inventory["node"]["vars"]["k8s_private_control_plane_endpoint"] = \
         terraform_output["controllb_private_k8s_endpoint"]["value"]
 
     inventory["node"]["vars"]["k8s_apiserver_cert_extra_sans"] = \
