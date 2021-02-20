@@ -25,6 +25,6 @@
   systemd:
     name: kubelet
     state: started
-  register: k8s_start_kubelet
+  register: k8s_start_kubelet_result
 
 - meta: flush_handlers
