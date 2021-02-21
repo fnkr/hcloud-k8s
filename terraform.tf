@@ -31,6 +31,16 @@ variable "cluster_node_image" {
   default = "ubuntu-20.04"
 }
 
+variable "k8s_version" {
+  type    = string
+  default = "1.20.4"
+}
+
+variable "k8s_version_label_key" {
+  type    = string
+  default = "k8s_version"
+}
+
 variable "cluster_label_key" {
   type    = string
   default = "k8s_cluster"
@@ -74,6 +84,10 @@ locals {
     (var.role_label_key) : var.role_label_worker,
   }
 
+  node_labels = {
+    (var.k8s_version_label_key) : var.k8s_version,
+  }
+
   initializer_labels = {
     (var.initializer_label_key) : var.initializer_label_value,
   }
@@ -113,7 +127,7 @@ resource "hcloud_server" "controlnode" {
   server_type = split(",", var.cluster_controlnode_types)[count.index]
   location    = split(",", var.cluster_controlnode_locations)[count.index]
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
-  labels      = merge(local.labels, local.control_labels, count.index == 0 ? local.initializer_labels : null)
+  labels      = merge(local.labels, local.control_labels, local.node_labels, count.index == 0 ? local.initializer_labels : null)
 
   connection {
     type = "ssh"
@@ -136,7 +150,7 @@ resource "hcloud_server" "workernode" {
   server_type = split(",", var.cluster_workernode_types)[count.index]
   location    = split(",", var.cluster_workernode_locations)[count.index]
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
-  labels      = merge(local.labels, local.worker_labels)
+  labels      = merge(local.labels, local.worker_labels, local.node_labels)
 
   connection {
     type = "ssh"
@@ -282,6 +296,10 @@ output "hcloud_token" {
 
 output "cluster_name" {
   value = var.cluster_name
+}
+
+output "k8s_version" {
+  value = var.k8s_version
 }
 
 output "initializer" {

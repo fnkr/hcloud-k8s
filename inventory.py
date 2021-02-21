@@ -38,6 +38,9 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_cluster_name"] = \
         terraform_output["cluster_name"]["value"]
 
+    inventory["node"]["vars"]["k8s_version"] = \
+        terraform_output["k8s_version"]["value"]
+
     inventory["node"]["vars"]["k8s_initializer"] = \
         terraform_output["initializer"]["value"]
 
