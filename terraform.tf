@@ -71,6 +71,16 @@ variable "initializer_label_value" {
   default = "1"
 }
 
+variable "status_label_key" {
+  type    = string
+  default = "k8s_status"
+}
+
+variable "status_label_up" {
+  type    = string
+  default = "up"
+}
+
 locals {
   labels = {
     (var.cluster_label_key) : var.cluster_name,
@@ -86,6 +96,7 @@ locals {
 
   node_labels = {
     (var.k8s_version_label_key) : var.k8s_version,
+    (var.status_label_key) : var.status_label_up,
   }
 
   initializer_labels = {
@@ -200,7 +211,7 @@ resource "hcloud_load_balancer_network" "controllb_network" {
 resource "hcloud_load_balancer_target" "controllb_target" {
   type             = "label_selector"
   load_balancer_id = hcloud_load_balancer.controllb.id
-  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_control}"
+  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_control},${var.status_label_key}=${var.status_label_up}"
   use_private_ip   = true
 
   depends_on = [
@@ -249,7 +260,7 @@ resource "hcloud_load_balancer_network" "workerlb_network" {
 resource "hcloud_load_balancer_target" "workerlb_target" {
   type             = "label_selector"
   load_balancer_id = hcloud_load_balancer.workerlb.id
-  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_worker}"
+  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_worker},${var.status_label_key}=${var.status_label_up}"
   use_private_ip   = true
 
   depends_on = [
