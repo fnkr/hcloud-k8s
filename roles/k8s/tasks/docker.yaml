@@ -2,6 +2,11 @@
   apt:
     name: docker.io
 
+- name: Prevent Docker from being upgraded
+  dpkg_selections:
+    name: docker.io
+    selection: hold
+
 - name: Enable and start Docker
   systemd:
     daemon_reload: true

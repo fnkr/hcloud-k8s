@@ -3,3 +3,11 @@
     name:
       - kubeadm={{ k8s_version }}-00
       - kubectl={{ k8s_version }}-00
+
+- name: Prevent kubeadm and kubectl from being upgraded
+  loop:
+    - kubelet
+    - kubectl
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold

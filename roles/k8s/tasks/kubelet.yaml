@@ -15,6 +15,11 @@
   apt:
     name: "kubelet={{ k8s_version }}-00"
 
+- name: Prevent kubelet from being upgraded
+  dpkg_selections:
+    name: kubelet
+    selection: hold
+
 - name: Enable kubelet
   systemd:
     daemon_reload: true
