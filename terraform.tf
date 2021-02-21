@@ -36,17 +36,53 @@ variable "cluster_label_key" {
   default = "k8s_cluster"
 }
 
-variable "cluster_node_role_label_key" {
+variable "role_label_key" {
   type    = string
-  default = "k8s_cluster_role"
+  default = "k8s_role"
+}
+
+variable "role_label_control" {
+  type    = string
+  default = "control"
+}
+
+variable "role_label_worker" {
+  type    = string
+  default = "worker"
+}
+
+variable "initializer_label_key" {
+  type    = string
+  default = "k8s_initializer"
+}
+
+variable "initializer_label_value" {
+  type    = string
+  default = "1"
+}
+
+locals {
+  labels = {
+    (var.cluster_label_key) : var.cluster_name,
+  }
+
+  control_labels = {
+    (var.role_label_key) : var.role_label_control,
+  }
+
+  worker_labels = {
+    (var.role_label_key) : var.role_label_worker,
+  }
+
+  initializer_labels = {
+    (var.initializer_label_key) : var.initializer_label_value,
+  }
 }
 
 resource "hcloud_network" "network" {
   name     = var.cluster_name
   ip_range = var.cluster_network_ip_range
-  labels = {
-    (var.cluster_label_key) : var.cluster_name,
-  }
+  labels   = local.labels
 }
 
 resource "hcloud_network_subnet" "network_subnet_loadbalancer" {
@@ -77,10 +113,7 @@ resource "hcloud_server" "controlnode" {
   server_type = split(",", var.cluster_controlnode_types)[count.index]
   location    = split(",", var.cluster_controlnode_locations)[count.index]
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
-  labels = {
-    (var.cluster_label_key) : var.cluster_name,
-    (var.cluster_node_role_label_key) : "control",
-  }
+  labels      = merge(local.labels, local.control_labels, count.index == 0 ? local.initializer_labels : null)
 
   connection {
     type = "ssh"
@@ -103,10 +136,7 @@ resource "hcloud_server" "workernode" {
   server_type = split(",", var.cluster_workernode_types)[count.index]
   location    = split(",", var.cluster_workernode_locations)[count.index]
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
-  labels = {
-    (var.cluster_label_key) : var.cluster_name,
-    (var.cluster_node_role_label_key) : "worker",
-  }
+  labels      = merge(local.labels, local.worker_labels)
 
   connection {
     type = "ssh"
@@ -140,10 +170,7 @@ resource "hcloud_load_balancer" "controllb" {
   name               = "${var.cluster_name}-control"
   load_balancer_type = var.cluster_controllb_type
   location           = var.cluster_controllb_location
-  labels = {
-    (var.cluster_label_key) : var.cluster_name,
-    (var.cluster_node_role_label_key) : "control",
-  }
+  labels             = merge(local.labels, local.control_labels)
 
   algorithm {
     type = "least_connections"
@@ -159,7 +186,7 @@ resource "hcloud_load_balancer_network" "controllb_network" {
 resource "hcloud_load_balancer_target" "controllb_target" {
   type             = "label_selector"
   load_balancer_id = hcloud_load_balancer.controllb.id
-  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.cluster_node_role_label_key}=control"
+  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_control}"
   use_private_ip   = true
 
   depends_on = [
@@ -192,10 +219,7 @@ resource "hcloud_load_balancer" "workerlb" {
   name               = "${var.cluster_name}-worker"
   load_balancer_type = var.cluster_workerlb_type
   location           = var.cluster_workerlb_location
-  labels = {
-    (var.cluster_label_key) : var.cluster_name,
-    (var.cluster_node_role_label_key) : "worker",
-  }
+  labels             = merge(local.labels, local.worker_labels)
 
   algorithm {
     type = "least_connections"
@@ -211,7 +235,7 @@ resource "hcloud_load_balancer_network" "workerlb_network" {
 resource "hcloud_load_balancer_target" "workerlb_target" {
   type             = "label_selector"
   load_balancer_id = hcloud_load_balancer.workerlb.id
-  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.cluster_node_role_label_key}=worker"
+  label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_worker}"
   use_private_ip   = true
 
   depends_on = [
@@ -258,6 +282,10 @@ output "hcloud_token" {
 
 output "cluster_name" {
   value = var.cluster_name
+}
+
+output "initializer" {
+  value = [for k, v in hcloud_server.controlnode.*.labels : hcloud_server.controlnode[k].name if try(v[var.initializer_label_key], null) == var.initializer_label_value][0]
 }
 
 output "controlnode_names" {
