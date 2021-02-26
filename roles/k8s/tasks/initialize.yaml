@@ -1,18 +1,45 @@
 - when: inventory_hostname == k8s_initializer
   block:
     - name: Initialize K8s cluster
+      vars:
+        k8s_kubeadm_init_config:
+          # https://pkg.go.dev/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta2
+          - apiVersion: kubeadm.k8s.io/v1beta2
+            kind: InitConfiguration
+            nodeRegistration:
+              criSocket: /run/containerd/containerd.sock
+            localAPIEndpoint:
+              advertiseAddress: "{{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}"
+          - apiVersion: kubeadm.k8s.io/v1beta2
+            kind: ClusterConfiguration
+            clusterName: "{{ k8s_cluster_name }}"
+            kubernetesVersion: "v{{ k8s_version }}"
+            controlPlaneEndpoint: "{{ k8s_private_control_plane_endpoint }}"
+            apiServer:
+              certSANs: "{{ [k8s_private_control_plane_endpoint.split(':')|first] + k8s_apiserver_cert_extra_sans }}"
+              extraArgs:
+                apiserver-count: "{{ k8s_controlnodes|length }}"
+            networking:
+              serviceSubnet: "{{ k8s_ip_range_service }}"
+              podSubnet: "{{ k8s_ip_range_pod }}"
+            etcd:
+              local:
+                extraArgs:
+                  listen-client-urls: "http://{{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}:2379"
+          - apiVersion: kubelet.config.k8s.io/v1beta1
+            kind: KubeletConfiguration
+            cgroupDriver: systemd
       args:
-        executable: bash
         creates: /etc/kubernetes/admin.conf
-      shell: >
-        kubeadm init
-        --kubernetes-version=v{{ k8s_version|quote }}
-        --node-name={{ inventory_hostname|quote }}
-        --service-cidr={{ k8s_ip_range_service|quote }}
-        --pod-network-cidr={{ k8s_ip_range_pod|quote }}
-        --control-plane-endpoint={{ k8s_private_control_plane_endpoint|quote }}
-        {% for san in k8s_apiserver_cert_extra_sans %}--apiserver-cert-extra-sans={{ san|quote }}{% if not loop.last %} {% endif %}{% endfor %}
-        --token-ttl=10m
+        stdin: |
+          {% for config in k8s_kubeadm_init_config %}
+          {{ config|to_nice_yaml(indent=2)|trim }}
+          {% if not loop.last %}
+          ---
+          {% endif %}
+          {% endfor %}
+      command: >
+        kubeadm init --config=/dev/stdin
 
     - name: Configure kube tools
       args:
