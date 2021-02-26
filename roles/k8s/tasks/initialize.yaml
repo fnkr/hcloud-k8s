@@ -7,7 +7,6 @@
       shell: >
         kubeadm init
         --kubernetes-version=v{{ k8s_version|quote }}
-        --node-name={{ inventory_hostname|quote }}
         --service-cidr={{ k8s_ip_range_service|quote }}
         --pod-network-cidr={{ k8s_ip_range_pod|quote }}
         --control-plane-endpoint={{ k8s_private_control_plane_endpoint|quote }}
