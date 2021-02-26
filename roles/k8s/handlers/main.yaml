@@ -1,5 +1,5 @@
 - name: Restart kubelet
-  when: not k8s_start_kubelet_result.changed|default(false)
+  when: not k8s_start_kubelet_result.changed
   systemd:
     name: kubelet
     state: restarted
