@@ -6,4 +6,4 @@
 
     - name: Install openshift Python package
       pip:
-        name: openshift
+        name: openshift==0.11.2
