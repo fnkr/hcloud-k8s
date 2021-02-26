@@ -1,3 +1,9 @@
+- name: Restart containerd
+  when: not k8s_start_containerd_result.changed
+  systemd:
+    name: containerd
+    state: restarted
+
 - name: Restart kubelet
   when: not k8s_start_kubelet_result.changed
   systemd:

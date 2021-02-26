@@ -1,0 +1,78 @@
+- name: Load kernel modules for containerd on boot
+  loop:
+    - /etc/modules-load.d/containerd.conf
+  copy:
+    content: |
+      overlay
+      br_netfilter
+    dest: "{{ item }}"
+
+- name: Load kernel modules for containerd
+  loop:
+    - overlay
+    - br_netfilter
+  modprobe:
+    name: "{{ item }}"
+
+- name: Update sysctl params for containerd
+  loop:
+    - name: net.bridge.bridge-nf-call-iptables
+      value: 1
+    - name: net.ipv4.ip_forward
+      value: 1
+    - name: net.bridge.bridge-nf-call-ip6tables
+      value: 1
+  sysctl:
+    sysctl_file: /etc/sysctl.d/55-containerd.conf
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+
+- name: Install containerd
+  apt:
+    name: containerd
+
+- name: Prevent containerd from being upgraded
+  dpkg_selections:
+    name: containerd
+    selection: hold
+
+- name: Install containerd default config
+  loop:
+    - /etc/containerd/config.toml
+  args:
+    creates: "{{ item }}"
+  shell: |
+    mkdir -p -- {{ item|dirname|quote }}
+    containerd config default > {{ item|quote }}
+  notify: Restart containerd
+
+- name: Customize containerd config
+  blockinfile:
+    path: /etc/containerd/config.toml
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: containerd"
+    block: |
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+        SystemdCgroup = true
+
+- name: Enable containerd
+  systemd:
+    daemon_reload: true
+    name: containerd
+    enabled: true
+
+- name: Start containerd
+  systemd:
+    name: containerd
+    state: started
+  register: k8s_start_containerd_result
+
+- meta: flush_handlers
+
+- name: Configure crictl
+  vars:
+    k8s_crictl_config:
+      runtime-endpoint: unix:///run/containerd/containerd.sock
+      image-endpoint: unix:///run/containerd/containerd.sock
+  copy:
+    content: "{{ k8s_crictl_config|to_nice_yaml(indent=2) }}"
+    dest: /etc/crictl.yaml

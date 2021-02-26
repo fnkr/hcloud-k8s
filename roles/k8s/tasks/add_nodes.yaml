@@ -1,3 +1,8 @@
+- name: Wait until cluster initialization is completed
+  when: k8s_initialize_cluster_result.changed
+  pause:
+    minutes: 1
+
 - name: Check if node is initialized
   when: inventory_hostname != k8s_initializer
   stat:

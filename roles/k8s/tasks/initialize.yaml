@@ -13,6 +13,7 @@
         --control-plane-endpoint={{ k8s_private_control_plane_endpoint|quote }}
         {% for san in k8s_apiserver_cert_extra_sans %}--apiserver-cert-extra-sans={{ san|quote }}{% if not loop.last %} {% endif %}{% endfor %}
         --token-ttl=10m
+      register: k8s_initialize_cluster_result
 
     - name: Configure kube tools
       args:

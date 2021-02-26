@@ -1,5 +1,5 @@
 - import_tasks: repository.yaml
-- import_tasks: docker.yaml
+- import_tasks: containerd.yaml
 - import_tasks: kubelet.yaml
 - import_tasks: tools.yaml
 - import_tasks: initialize.yaml

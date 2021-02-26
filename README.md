@@ -7,6 +7,7 @@ This repository contains a Terraform module and Ansible playbook to provision
 
 * High availability: creates three control nodes and three worker nodes (by default)
 * etcd stacked on control plane nodes
+* containerd container runtime
 * Installs [Hetzner Cloud Controller Manager](https://github.com/hetznercloud/hcloud-cloud-controller-manager)
 * Installs [Hetzner Cloud Container Storage Interface](https://github.com/hetznercloud/csi-driver)
 * Uses Hetzner Cloud Networks for all traffic between nodes

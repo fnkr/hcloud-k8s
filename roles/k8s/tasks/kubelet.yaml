@@ -7,7 +7,7 @@
   copy:
     content: |
       [Service]
-      Environment=KUBELET_EXTRA_ARGS=--cloud-provider=external
+      Environment=KUBELET_EXTRA_ARGS="--cloud-provider=external --cgroup-driver=systemd"
     dest: /etc/systemd/system/kubelet.service.d/ansible.conf
   notify: Restart kubelet
 
