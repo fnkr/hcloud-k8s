@@ -7,7 +7,7 @@
   copy:
     content: |
       [Service]
-      Environment=KUBELET_EXTRA_ARGS="--cloud-provider=external --cgroup-driver=systemd"
+      Environment=KUBELET_EXTRA_ARGS="--cloud-provider=external --cgroup-driver=systemd --node-ip={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode if inventory_hostname in k8s_controlnodes else k8s_ip_range_workernode)|first }}"
     dest: /etc/systemd/system/kubelet.service.d/ansible.conf
   notify: Restart kubelet
 

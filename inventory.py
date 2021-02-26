@@ -44,6 +44,12 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_initializer"] = \
         terraform_output["initializer"]["value"]
 
+    inventory["node"]["vars"]["k8s_ip_range_controlnode"] = \
+        terraform_output["cluster_network_ip_range_controlnode"]["value"]
+
+    inventory["node"]["vars"]["k8s_ip_range_workernode"] = \
+        terraform_output["cluster_network_ip_range_workernode"]["value"]
+
     inventory["node"]["vars"]["k8s_ip_range_service"] = \
         terraform_output["cluster_network_ip_range_service"]["value"]
 
