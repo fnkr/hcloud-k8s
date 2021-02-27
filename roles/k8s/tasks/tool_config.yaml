@@ -1,0 +1,45 @@
+- name: Get kube and etcd-client config
+  when: inventory_hostname == k8s_initializer
+  loop:
+    - src: /etc/kubernetes/admin.conf
+      dest: /root/.kube/config
+    - src: /etc/kubernetes/pki/etcd/ca.crt
+      dest: /root/.etcd/ca.crt
+    - src: /etc/kubernetes/pki/etcd/server.crt
+      dest: /root/.etcd/server.crt
+    - src: /etc/kubernetes/pki/etcd/server.key
+      dest: /root/.etcd/server.key
+  loop_control:
+    label: "{{ item.src }}"
+  slurp:
+    src: "{{ item.src }}"
+  register: k8s_get_kube_and_etcd_client_config_result
+
+- when: inventory_hostname in k8s_controlnodes
+  block:
+    - name: Create directories for kube and etcd-client config
+      loop:
+        - /root/.kube
+        - /root/.etcd
+      file:
+        path: "{{ item }}"
+        state: directory
+
+    - name: Write kube and etcd-client config
+      loop: "{{ hostvars[k8s_initializer].k8s_get_kube_and_etcd_client_config_result.results }}"
+      loop_control:
+        label: "{{ item.item.dest }}"
+      copy:
+        content: "{{ item.content|b64decode }}"
+        dest: "{{ item.item.dest }}"
+
+    - name: Add etcd-ctl config to .bashrc
+      blockinfile:
+        path: /root/.bashrc
+        marker: "# {mark} ANSIBLE MANAGED BLOCK: etcd-ctl"
+        block: |
+          export ETCDCTL_API=3
+          export ETCDCTL_ENDPOINTS=https://127.0.0.1:2379
+          export ETCDCTL_CACERT=/root/.etcd/ca.crt
+          export ETCDCTL_CERT=/root/.etcd/server.crt
+          export ETCDCTL_KEY=/root/.etcd/server.key

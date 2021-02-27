@@ -1,13 +1,21 @@
-- name: Install kubeadm and kubectl
+- name: Install kubeadm
   apt:
-    name:
-      - kubeadm={{ k8s_version }}-00
-      - kubectl={{ k8s_version }}-00
+    name: "kubeadm={{ k8s_version }}-00"
 
-- name: Prevent kubeadm and kubectl from being upgraded
-  loop:
-    - kubelet
-    - kubectl
+- name: Prevent kubeadm from being upgraded
   dpkg_selections:
-    name: "{{ item }}"
+    name: kubeadm
     selection: hold
+
+- when: inventory_hostname in k8s_controlnodes
+  block:
+    - name: Install kubectl and etcd-client
+      apt:
+        name:
+          - kubectl={{ k8s_version }}-00
+          - etcd-client
+
+    - name: Prevent kubectl from being upgraded
+      dpkg_selections:
+        name: kubectl
+        selection: hold

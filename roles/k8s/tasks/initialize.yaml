@@ -14,11 +14,3 @@
         --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}
         --token-ttl=10m
       register: k8s_initialize_cluster_result
-
-    - name: Configure kube tools
-      args:
-        creates: "{{ ansible_env.HOME }}/.kube/config"
-      shell: |
-        set -e
-        mkdir -p ~/.kube
-        cp /etc/kubernetes/admin.conf ~/.kube/config
