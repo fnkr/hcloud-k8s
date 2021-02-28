@@ -43,16 +43,25 @@
     creates: "{{ item }}"
   shell: |
     mkdir -p -- {{ item|dirname|quote }}
-    containerd config default > {{ item|quote }}
+    containerd config default | awk '{$1=$1};1' > {{ item|quote }}
   notify: Restart containerd
 
-- name: Customize containerd config
-  blockinfile:
+- name: Configure containerd to use systemd cgroup
+  ini_file:
     path: /etc/containerd/config.toml
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: containerd"
-    block: |
-      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-        SystemdCgroup = true
+    section: 'plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options'
+    option: SystemdCgroup
+    value: "true"
+  notify: Restart containerd
+
+- name: Configure containerd registry mirrors
+  loop: "{{ k8s_registry_mirrors|dict2items }}"
+  ini_file:
+    path: /etc/containerd/config.toml
+    section: 'plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ item.key }}"'
+    option: endpoint
+    value: "{{ item.value|to_json }}"
+  notify: Restart containerd
 
 - name: Enable containerd
   systemd:

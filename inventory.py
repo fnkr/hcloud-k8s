@@ -70,6 +70,9 @@ def build_inventory(terraform_output):
 
     inventory["node"]["vars"]["k8s_cni"] = \
         terraform_output["cluster_cni"]["value"]
+
+    inventory["node"]["vars"]["k8s_registry_mirrors"] = \
+        terraform_output["registry_mirrors"]["value"]
     # fmt: on
 
     for group in [

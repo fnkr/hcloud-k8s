@@ -25,6 +25,7 @@ variable "cluster_workerlb_type" {}
 variable "cluster_workerlb_location" {}
 variable "cluster_ingress" {}
 variable "cluster_cni" {}
+variable "registry_mirrors" {}
 
 variable "cluster_node_image" {
   type    = string
@@ -367,4 +368,8 @@ output "cluster_ingress" {
 
 output "cluster_cni" {
   value = var.cluster_cni
+}
+
+output "registry_mirrors" {
+  value = var.registry_mirrors
 }

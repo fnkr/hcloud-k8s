@@ -21,3 +21,6 @@ cluster_workerlb_type                 = "lb11"
 cluster_workerlb_location             = "nbg1"
 cluster_ingress                       = "nginx"
 cluster_cni                           = "cilium"
+registry_mirrors = {
+  "docker.io" : ["https://registry-1.docker.io"]
+}

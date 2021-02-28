@@ -13,3 +13,4 @@ k8s_hcloud_token:
 k8s_cluster_name:
 k8s_ingress:
 k8s_cni:
+k8s_registry_mirrors: {}
