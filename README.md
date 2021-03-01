@@ -86,3 +86,10 @@ It will not delete anything created by Kubernetes (e.g. volumes created using pe
 ```
 terraform destroy -auto-approve
 ```
+
+## Working with multiple state/var files
+
+```
+terraform apply -var-file production.tfvars -state production.tfstate
+TF_STATE=production.tfstate ansible-playbook ansible.yaml
+```
