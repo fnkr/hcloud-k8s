@@ -134,7 +134,7 @@ resource "hcloud_network_subnet" "network_subnet_workernode" {
 
 resource "hcloud_server" "controlnode" {
   count       = var.cluster_controlnode_count
-  name        = "${var.cluster_name}-controlnode-${count.index + 1}"
+  name        = "${var.cluster_name}-control-${format("%03d", count.index + 1)}"
   image       = var.cluster_node_image
   server_type = split(",", var.cluster_controlnode_types)[count.index]
   location    = split(",", var.cluster_controlnode_locations)[count.index]
@@ -157,7 +157,7 @@ resource "hcloud_server" "controlnode" {
 
 resource "hcloud_server" "workernode" {
   count       = var.cluster_workernode_count
-  name        = "${var.cluster_name}-workernode-${count.index + 1}"
+  name        = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
   image       = var.cluster_node_image
   server_type = split(",", var.cluster_workernode_types)[count.index]
   location    = split(",", var.cluster_workernode_locations)[count.index]
