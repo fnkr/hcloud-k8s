@@ -1,9 +1,14 @@
 .DELETE_ON_ERROR:
-.PHONY: all
-all: cilium.yaml
+.PHONY: all init
+all: init cilium.yaml
+
+init:
+	helm repo add cilium https://helm.cilium.io
+	helm repo update
 
 cilium.yaml:
-	curl -fsSL -o cilium.yaml https://github.com/hetznercloud/hcloud-cloud-controller-manager/raw/master/e2etests/templates/cilium.yml
+	helm template cilium cilium/cilium --version 1.7.1 -n kube-system -f values.yaml > cilium.yaml
+	sed -i -E 's/(enable-remote-node-identity: "true")/\1\n  blacklist-conflicting-routes: "false"/' cilium.yaml
 
 clean:
 	rm -f cilium.yaml
