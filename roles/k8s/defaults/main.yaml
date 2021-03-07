@@ -2,6 +2,7 @@ k8s_version:
 k8s_initializer:
 k8s_controlnodes:
 k8s_workernodes:
+k8s_ip_range:
 k8s_ip_range_controlnode:
 k8s_ip_range_workernode:
 k8s_ip_range_service:

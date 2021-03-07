@@ -1,8 +1,3 @@
-- name: Wait until etcd is running stable
-  when: k8s_initialize_cluster_result.changed
-  pause:
-    minutes: 5
-
 - name: Check if node is initialized
   when: inventory_hostname != k8s_initializer
   stat:
@@ -37,10 +32,10 @@
       throttle: 1
       when: inventory_hostname in k8s_controlnodes
       shell: |
-        {{ hostvars[k8s_initializer].k8s_join_controller_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}
+        sleep 30 && {{ hostvars[k8s_initializer].k8s_join_controller_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}
 
     - name: Add worker nodes to cluster
       throttle: 1
       when: inventory_hostname in k8s_workernodes
       shell: |
-        {{ hostvars[k8s_initializer].k8s_join_worker_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_workernode)|first }}
+        sleep 30 && {{ hostvars[k8s_initializer].k8s_join_worker_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_workernode)|first }}

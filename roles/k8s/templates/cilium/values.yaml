@@ -1,2 +1,7 @@
-global:
-  tunnel: disabled
+tunnel: disabled
+endpointRoutes:
+  enabled: true
+ipam:
+  operator:
+    clusterPoolIPv4PodCIDR: "{{ k8s_ip_range_pod }}"
+nativeRoutingCIDR: "\"{{ k8s_ip_range }}\""

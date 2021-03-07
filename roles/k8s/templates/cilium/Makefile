@@ -7,8 +7,7 @@ init:
 	helm repo update
 
 cilium.yaml:
-	helm template cilium cilium/cilium --version 1.7.1 -n kube-system -f values.yaml > cilium.yaml
-	sed -i -E 's/(enable-remote-node-identity: "true")/\1\n  blacklist-conflicting-routes: "false"/' cilium.yaml
+	helm template cilium cilium/cilium --version 1.9.4 -n kube-system -f values.yaml > cilium.yaml
 
 clean:
 	rm -f cilium.yaml

@@ -334,6 +334,10 @@ output "workernode_ipv4_addresses" {
   value = hcloud_server.workernode.*.ipv4_address
 }
 
+output "cluster_network_ip_range" {
+  value = var.cluster_network_ip_range
+}
+
 output "cluster_network_ip_range_controlnode" {
   value = var.cluster_network_ip_range_controlnode
 }
