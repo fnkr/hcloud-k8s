@@ -8,9 +8,7 @@ def get_terraform_output():
     tf_cmd = ["terraform", "output", "-json"]
     if "TF_STATE" in os.environ:
         tf_cmd.extend(["-state", os.environ["TF_STATE"]])
-    return json.loads(
-        subprocess.check_output(tf_cmd).decode("utf-8")
-    )
+    return json.loads(subprocess.check_output(tf_cmd).decode("utf-8"))
 
 
 def build_inventory(terraform_output):
@@ -23,7 +21,10 @@ def build_inventory(terraform_output):
         },
         "node": {
             "children": ["controlnode", "workernode"],
-            "vars": {},
+            "vars": {
+                "k8s_controlnodes": [],
+                "k8s_workernodes": [],
+            },
         },
         "controlnode": {
             "hosts": [],
@@ -101,8 +102,10 @@ def build_inventory(terraform_output):
 
             inventory["_meta"]["hostvars"][node_name] = {
                 "ansible_host": node_ipv4_address,
+                "ansible_user": "root",
             }
             inventory[node_group]["hosts"].append(node_name)
+            inventory["node"]["vars"][f"k8s_{node_group}s"].append(node_name)
 
     return inventory
 

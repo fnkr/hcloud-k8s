@@ -1,2 +1,0 @@
-k8s_controlnodes: "{{ groups.controlnode }}"
-k8s_workernodes: "{{ groups.workernode }}"
