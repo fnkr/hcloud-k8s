@@ -7,6 +7,10 @@ resource "hcloud_server" "workernode" {
   ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
   labels      = merge(local.labels, local.worker_labels, local.node_labels)
 
+  firewall_ids = [
+    hcloud_firewall.nodefw.id
+  ]
+
   connection {
     type = "ssh"
     user = "root"
