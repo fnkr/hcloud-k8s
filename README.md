@@ -12,6 +12,7 @@ This repository contains a Terraform module and Ansible playbook to provision
 * Installs [Hetzner Cloud Container Storage Interface](https://github.com/hetznercloud/csi-driver)
 * Uses Hetzner Cloud Networks for all traffic between nodes
 * Uses Cilium with native routing through Hetzner Cloud Networks
+* Optional IPsec tunneling for traffic between nodes
 * Creates Hetzner Cloud Load Balancer for traffic to K8s API
 * Creates Hetzner Cloud Load Balancer for traffic to worker nodes (ingress) 
 * Installs [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) as DaemonSet

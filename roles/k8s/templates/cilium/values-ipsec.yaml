@@ -1,0 +1,4 @@
+encryption:
+  enabled: true
+  nodeEncryption: true
+  interface: ens10
