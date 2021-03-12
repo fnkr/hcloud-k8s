@@ -2,6 +2,5 @@ tunnel: disabled
 endpointRoutes:
   enabled: true
 ipam:
-  operator:
-    clusterPoolIPv4PodCIDR: "{{ k8s_ip_range_pod }}"
+  mode: kubernetes
 nativeRoutingCIDR: "\"{{ k8s_ip_range }}\""
