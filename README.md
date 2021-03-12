@@ -92,4 +92,5 @@ terraform destroy -auto-approve
 ```
 terraform apply -var-file production.tfvars -state production.tfstate
 TF_STATE=production.tfstate ansible-playbook ansible.yaml
+TF_STATE=production.tfstate ansible-playbook kubeconfig.yaml
 ```
