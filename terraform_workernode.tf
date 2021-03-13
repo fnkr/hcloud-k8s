@@ -1,5 +1,9 @@
+locals {
+  cluster_workernode_count = length(split(",", var.cluster_workernode_types))
+}
+
 resource "hcloud_server" "workernode" {
-  count       = var.cluster_workernode_count
+  count       = local.cluster_workernode_count
   name        = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
   image       = var.cluster_node_image
   server_type = split(",", var.cluster_workernode_types)[count.index]
@@ -33,7 +37,7 @@ resource "hcloud_network_subnet" "network_subnet_workernode" {
 }
 
 resource "hcloud_server_network" "workernode_network" {
-  count      = var.cluster_workernode_count
+  count      = local.cluster_workernode_count
   server_id  = hcloud_server.workernode[count.index].id
   network_id = hcloud_network.network.id
   ip         = cidrhost(hcloud_network_subnet.network_subnet_workernode.ip_range, count.index + 1)

@@ -1,5 +1,9 @@
+locals {
+  cluster_controlnode_count = length(split(",", var.cluster_controlnode_types))
+}
+
 resource "hcloud_server" "controlnode" {
-  count       = var.cluster_controlnode_count
+  count       = local.cluster_controlnode_count
   name        = "${var.cluster_name}-control-${format("%03d", count.index + 1)}"
   image       = var.cluster_node_image
   server_type = split(",", var.cluster_controlnode_types)[count.index]
@@ -33,7 +37,7 @@ resource "hcloud_network_subnet" "network_subnet_controlnode" {
 }
 
 resource "hcloud_server_network" "controlnode_network" {
-  count      = var.cluster_controlnode_count
+  count      = local.cluster_controlnode_count
   server_id  = hcloud_server.controlnode[count.index].id
   network_id = hcloud_network.network.id
   ip         = cidrhost(hcloud_network_subnet.network_subnet_controlnode.ip_range, count.index + 1)

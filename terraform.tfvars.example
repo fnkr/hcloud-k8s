@@ -1,10 +1,8 @@
 hcloud_token                          = ""
 cluster_authorized_ssh_keys           = ""
 cluster_name                          = "terrakube"
-cluster_controlnode_count             = 3
 cluster_controlnode_types             = "cx21,cx21,cx21"
 cluster_controlnode_locations         = "nbg1,fsn1,hel1"
-cluster_workernode_count              = 3
 cluster_workernode_types              = "cx21,cx21,cx21"
 cluster_workernode_locations          = "nbg1,fsn1,hel1"
 cluster_network_zone                  = "eu-central"

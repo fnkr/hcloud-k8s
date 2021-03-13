@@ -1,10 +1,8 @@
 variable "hcloud_token" {}
 variable "cluster_authorized_ssh_keys" {}
 variable "cluster_name" {}
-variable "cluster_controlnode_count" {}
 variable "cluster_controlnode_types" {}
 variable "cluster_controlnode_locations" {}
-variable "cluster_workernode_count" {}
 variable "cluster_workernode_types" {}
 variable "cluster_workernode_locations" {}
 variable "cluster_network_zone" {}
