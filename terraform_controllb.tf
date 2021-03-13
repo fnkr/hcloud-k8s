@@ -29,7 +29,7 @@ resource "hcloud_load_balancer_target" "controllb_target" {
 resource "hcloud_load_balancer_service" "controllb_service_https" {
   load_balancer_id = hcloud_load_balancer.controllb.id
   protocol         = "tcp"
-  listen_port      = var.cluster_controllb_listen_port
+  listen_port      = 6443
   destination_port = 6443
 
   health_check {
