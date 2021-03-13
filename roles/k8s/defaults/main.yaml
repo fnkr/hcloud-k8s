@@ -10,8 +10,8 @@ k8s_ip_range_pod:
 k8s_control_plane_endpoint:
 k8s_private_control_plane_endpoint_ip:
 k8s_private_control_plane_endpoint_port:
-k8s_private_control_plane_endpoint_alias: "{{ k8s_cluster_name }}-control"
-k8s_private_control_plane_endpoint: "{{ k8s_private_control_plane_endpoint_alias }}:{{ k8s_private_control_plane_endpoint_port }}"
+k8s_private_control_plane_endpoint_alias:
+k8s_private_control_plane_endpoint:
 k8s_apiserver_cert_extra_sans: []
 k8s_hcloud_token:
 k8s_cluster_name:

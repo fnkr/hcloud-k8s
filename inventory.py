@@ -67,6 +67,12 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_control_plane_endpoint"] = \
         terraform_output["controllb_k8s_endpoint"]["value"]
 
+    inventory["node"]["vars"]["k8s_private_control_plane_endpoint_alias"] = \
+        "{{ k8s_cluster_name }}-control"
+
+    inventory["node"]["vars"]["k8s_private_control_plane_endpoint"] = \
+        "{{ k8s_private_control_plane_endpoint_alias }}:{{ k8s_private_control_plane_endpoint_port }}"
+
     inventory["node"]["vars"]["k8s_apiserver_cert_extra_sans"] = \
         [terraform_output["controllb_ipv4_address"]["value"]]
 
