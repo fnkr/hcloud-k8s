@@ -1,14 +1,22 @@
+variable "cluster_workernode_types" {
+  type = list(string)
+}
+
+variable "cluster_workernode_locations" {
+  type = list(string)
+}
+
 locals {
-  cluster_workernode_count = length(split(",", var.cluster_workernode_types))
+  cluster_workernode_count = length(var.cluster_workernode_types)
 }
 
 resource "hcloud_server" "workernode" {
   count       = local.cluster_workernode_count
   name        = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
   image       = var.cluster_node_image
-  server_type = split(",", var.cluster_workernode_types)[count.index]
-  location    = split(",", var.cluster_workernode_locations)[count.index]
-  ssh_keys    = split(",", var.cluster_authorized_ssh_keys)
+  server_type = var.cluster_workernode_types[count.index]
+  location    = var.cluster_workernode_locations[count.index]
+  ssh_keys    = var.cluster_authorized_ssh_keys
   labels      = merge(local.labels, local.worker_labels, local.node_labels)
 
   firewall_ids = [

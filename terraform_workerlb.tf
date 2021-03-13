@@ -1,15 +1,20 @@
-variable "cluster_workerlb_types" {}
-variable "cluster_workerlb_locations" {}
+variable "cluster_workerlb_types" {
+  type = list(string)
+}
+
+variable "cluster_workerlb_locations" {
+  type = list(string)
+}
 
 locals {
-  cluster_workerlb_count = length(split(",", var.cluster_workerlb_types))
+  cluster_workerlb_count = length(var.cluster_workerlb_types)
 }
 
 resource "hcloud_load_balancer" "workerlb" {
   count              = local.cluster_workerlb_count
   name               = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
-  load_balancer_type = split(",", var.cluster_workerlb_types)[count.index]
-  location           = split(",", var.cluster_workerlb_locations)[count.index]
+  load_balancer_type = var.cluster_workerlb_types[count.index]
+  location           = var.cluster_workerlb_locations[count.index]
   labels             = merge(local.labels, local.worker_labels)
 
   algorithm {

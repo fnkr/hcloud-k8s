@@ -1,10 +1,5 @@
 variable "hcloud_token" {}
-variable "cluster_authorized_ssh_keys" {}
 variable "cluster_name" {}
-variable "cluster_controlnode_types" {}
-variable "cluster_controlnode_locations" {}
-variable "cluster_workernode_types" {}
-variable "cluster_workernode_locations" {}
 variable "cluster_network_zone" {}
 variable "cluster_network_ip_range" {}
 variable "cluster_network_ip_range_controllb" {}
@@ -16,6 +11,10 @@ variable "cluster_network_ip_range_pod" {}
 variable "cluster_ingress" {}
 variable "cluster_cni" {}
 variable "registry_mirrors" {}
+
+variable "cluster_authorized_ssh_keys" {
+  type = list(string)
+}
 
 variable "cluster_node_image" {
   type    = string

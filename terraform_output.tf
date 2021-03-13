@@ -65,13 +65,13 @@ output "controllb_private_k8s_endpoint_port" {
 
 output "controllb_private_k8s_endpoint_ips_for_controlnodes" {
   value = [
-    for location in split(",", var.cluster_controlnode_locations) : hcloud_load_balancer_network.controllb_network[try(index(split(",", var.cluster_controllb_locations), location), 0)].ip
+    for location in var.cluster_controlnode_locations : hcloud_load_balancer_network.controllb_network[try(index(var.cluster_controllb_locations, location), 0)].ip
   ]
 }
 
 output "controllb_private_k8s_endpoint_ips_for_workernodes" {
   value = [
-    for location in split(",", var.cluster_workernode_locations) : hcloud_load_balancer_network.controllb_network[try(index(split(",", var.cluster_workerlb_locations), location), 0)].ip
+    for location in var.cluster_workernode_locations : hcloud_load_balancer_network.controllb_network[try(index(var.cluster_workerlb_locations, location), 0)].ip
   ]
 }
 
