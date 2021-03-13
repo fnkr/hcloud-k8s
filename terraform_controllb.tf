@@ -9,10 +9,17 @@ resource "hcloud_load_balancer" "controllb" {
   }
 }
 
+resource "hcloud_network_subnet" "network_subnet_controllb" {
+  type         = "cloud"
+  network_id   = hcloud_network.network.id
+  network_zone = var.cluster_network_zone
+  ip_range     = var.cluster_network_ip_range_controllb
+}
+
 resource "hcloud_load_balancer_network" "controllb_network" {
   load_balancer_id = hcloud_load_balancer.controllb.id
   network_id       = hcloud_network.network.id
-  ip               = cidrhost(hcloud_network_subnet.network_subnet_loadbalancer.ip_range, 1)
+  ip               = cidrhost(hcloud_network_subnet.network_subnet_controllb.ip_range, 1)
 }
 
 resource "hcloud_load_balancer_target" "controllb_target" {

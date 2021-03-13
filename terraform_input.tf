@@ -9,7 +9,8 @@ variable "cluster_workernode_types" {}
 variable "cluster_workernode_locations" {}
 variable "cluster_network_zone" {}
 variable "cluster_network_ip_range" {}
-variable "cluster_network_ip_range_loadbalancer" {}
+variable "cluster_network_ip_range_controllb" {}
+variable "cluster_network_ip_range_workerlb" {}
 variable "cluster_network_ip_range_controlnode" {}
 variable "cluster_network_ip_range_workernode" {}
 variable "cluster_network_ip_range_service" {}
