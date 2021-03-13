@@ -71,7 +71,7 @@ output "controllb_private_k8s_endpoint_ips_for_controlnodes" {
 
 output "controllb_private_k8s_endpoint_ips_for_workernodes" {
   value = [
-    for location in var.cluster_workernode_locations : hcloud_load_balancer_network.controllb_network[try(index(var.cluster_workerlb_locations, location), 0)].ip
+    for location in var.cluster_workernode_locations : hcloud_load_balancer_network.controllb_network[try(index(var.cluster_controllb_locations, location), 0)].ip
   ]
 }
 
