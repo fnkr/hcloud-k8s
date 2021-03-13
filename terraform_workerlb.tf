@@ -1,7 +1,15 @@
+variable "cluster_workerlb_types" {}
+variable "cluster_workerlb_locations" {}
+
+locals {
+  cluster_workerlb_count = length(split(",", var.cluster_workerlb_types))
+}
+
 resource "hcloud_load_balancer" "workerlb" {
-  name               = "${var.cluster_name}-worker"
-  load_balancer_type = var.cluster_workerlb_type
-  location           = var.cluster_workerlb_location
+  count              = local.cluster_workerlb_count
+  name               = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
+  load_balancer_type = split(",", var.cluster_workerlb_types)[count.index]
+  location           = split(",", var.cluster_workerlb_locations)[count.index]
   labels             = merge(local.labels, local.worker_labels)
 
   algorithm {
@@ -17,14 +25,16 @@ resource "hcloud_network_subnet" "network_subnet_workerlb" {
 }
 
 resource "hcloud_load_balancer_network" "workerlb_network" {
-  load_balancer_id = hcloud_load_balancer.workerlb.id
+  count            = local.cluster_workerlb_count
+  load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
   network_id       = hcloud_network.network.id
-  ip               = cidrhost(hcloud_network_subnet.network_subnet_workerlb.ip_range, 1)
+  ip               = cidrhost(hcloud_network_subnet.network_subnet_workerlb.ip_range, count.index + 1)
 }
 
 resource "hcloud_load_balancer_target" "workerlb_target" {
+  count            = local.cluster_workerlb_count
   type             = "label_selector"
-  load_balancer_id = hcloud_load_balancer.workerlb.id
+  load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
   label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_worker},${var.status_label_key}=${var.status_label_up}"
   use_private_ip   = true
 
@@ -34,7 +44,8 @@ resource "hcloud_load_balancer_target" "workerlb_target" {
 }
 
 resource "hcloud_load_balancer_service" "workerlb_service_http" {
-  load_balancer_id = hcloud_load_balancer.workerlb.id
+  count            = local.cluster_workerlb_count
+  load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
   protocol         = "tcp"
   listen_port      = 80
   destination_port = 80
@@ -50,7 +61,8 @@ resource "hcloud_load_balancer_service" "workerlb_service_http" {
 }
 
 resource "hcloud_load_balancer_service" "workerlb_service_https" {
-  load_balancer_id = hcloud_load_balancer.workerlb.id
+  count            = local.cluster_workerlb_count
+  load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
   protocol         = "tcp"
   listen_port      = 443
   destination_port = 443

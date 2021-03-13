@@ -52,15 +52,27 @@ output "cluster_network_ip_range_pod" {
 }
 
 output "controllb_ipv4_address" {
-  value = hcloud_load_balancer.controllb.ipv4
+  value = hcloud_load_balancer.controllb[0].ipv4
 }
 
 output "controllb_k8s_endpoint" {
-  value = "${hcloud_load_balancer.controllb.ipv4}:${hcloud_load_balancer_service.controllb_service_https.listen_port}"
+  value = "${hcloud_load_balancer.controllb[0].ipv4}:${hcloud_load_balancer_service.controllb_service_https[0].listen_port}"
 }
 
-output "controllb_private_k8s_endpoint" {
-  value = "${hcloud_load_balancer_network.controllb_network.ip}:${hcloud_load_balancer_service.controllb_service_https.listen_port}"
+output "controllb_private_k8s_endpoint_port" {
+  value = hcloud_load_balancer_service.controllb_service_https[0].listen_port
+}
+
+output "controllb_private_k8s_endpoint_ips_for_controlnodes" {
+  value = [
+    for location in split(",", var.cluster_controlnode_locations) : hcloud_load_balancer_network.controllb_network[try(index(split(",", var.cluster_controllb_locations), location), 0)].ip
+  ]
+}
+
+output "controllb_private_k8s_endpoint_ips_for_workernodes" {
+  value = [
+    for location in split(",", var.cluster_workernode_locations) : hcloud_load_balancer_network.controllb_network[try(index(split(",", var.cluster_workerlb_locations), location), 0)].ip
+  ]
 }
 
 output "cluster_ingress" {

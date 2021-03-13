@@ -1,7 +1,15 @@
+variable "cluster_controllb_types" {}
+variable "cluster_controllb_locations" {}
+
+locals {
+  cluster_controllb_count = length(split(",", var.cluster_controllb_types))
+}
+
 resource "hcloud_load_balancer" "controllb" {
-  name               = "${var.cluster_name}-control"
-  load_balancer_type = var.cluster_controllb_type
-  location           = var.cluster_controllb_location
+  count              = local.cluster_controllb_count
+  name               = "${var.cluster_name}-control-${format("%03d", count.index + 1)}"
+  load_balancer_type = split(",", var.cluster_controllb_types)[count.index]
+  location           = split(",", var.cluster_controllb_locations)[count.index]
   labels             = merge(local.labels, local.control_labels)
 
   algorithm {
@@ -17,14 +25,16 @@ resource "hcloud_network_subnet" "network_subnet_controllb" {
 }
 
 resource "hcloud_load_balancer_network" "controllb_network" {
-  load_balancer_id = hcloud_load_balancer.controllb.id
+  count            = local.cluster_controllb_count
+  load_balancer_id = hcloud_load_balancer.controllb[count.index].id
   network_id       = hcloud_network.network.id
-  ip               = cidrhost(hcloud_network_subnet.network_subnet_controllb.ip_range, 1)
+  ip               = cidrhost(hcloud_network_subnet.network_subnet_controllb.ip_range, count.index + 1)
 }
 
 resource "hcloud_load_balancer_target" "controllb_target" {
+  count            = local.cluster_controllb_count
   type             = "label_selector"
-  load_balancer_id = hcloud_load_balancer.controllb.id
+  load_balancer_id = hcloud_load_balancer.controllb[count.index].id
   label_selector   = "${var.cluster_label_key}=${var.cluster_name},${var.role_label_key}=${var.role_label_control},${var.status_label_key}=${var.status_label_up}"
   use_private_ip   = true
 
@@ -34,7 +44,8 @@ resource "hcloud_load_balancer_target" "controllb_target" {
 }
 
 resource "hcloud_load_balancer_service" "controllb_service_https" {
-  load_balancer_id = hcloud_load_balancer.controllb.id
+  count            = local.cluster_controllb_count
+  load_balancer_id = hcloud_load_balancer.controllb[count.index].id
   protocol         = "tcp"
   listen_port      = 6443
   destination_port = 6443

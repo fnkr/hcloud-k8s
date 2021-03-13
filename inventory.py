@@ -67,9 +67,6 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_control_plane_endpoint"] = \
         terraform_output["controllb_k8s_endpoint"]["value"]
 
-    inventory["node"]["vars"]["k8s_private_control_plane_endpoint"] = \
-        terraform_output["controllb_private_k8s_endpoint"]["value"]
-
     inventory["node"]["vars"]["k8s_apiserver_cert_extra_sans"] = \
         [terraform_output["controllb_ipv4_address"]["value"]]
 
@@ -103,6 +100,12 @@ def build_inventory(terraform_output):
             inventory["_meta"]["hostvars"][node_name] = {
                 "ansible_host": node_ipv4_address,
                 "ansible_user": "root",
+                "k8s_private_control_plane_endpoint_ip": terraform_output[
+                    f"controllb_private_k8s_endpoint_ips_for_{node_group}s"
+                ]["value"][node],
+                "k8s_private_control_plane_endpoint_port": terraform_output[
+                    "controllb_private_k8s_endpoint_port"
+                ]["value"],
             }
             inventory[node_group]["hosts"].append(node_name)
             inventory["node"]["vars"][f"k8s_{node_group}s"].append(node_name)

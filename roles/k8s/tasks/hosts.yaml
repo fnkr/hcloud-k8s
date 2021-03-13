@@ -1,0 +1,6 @@
+- name: Create host entries for control node load balancers
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} k8s controllb"
+    block: |
+      {{ k8s_private_control_plane_endpoint_ip }} {{ k8s_private_control_plane_endpoint_alias }}

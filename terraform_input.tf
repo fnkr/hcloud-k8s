@@ -13,10 +13,6 @@ variable "cluster_network_ip_range_controlnode" {}
 variable "cluster_network_ip_range_workernode" {}
 variable "cluster_network_ip_range_service" {}
 variable "cluster_network_ip_range_pod" {}
-variable "cluster_controllb_type" {}
-variable "cluster_controllb_location" {}
-variable "cluster_workerlb_type" {}
-variable "cluster_workerlb_location" {}
 variable "cluster_ingress" {}
 variable "cluster_cni" {}
 variable "registry_mirrors" {}

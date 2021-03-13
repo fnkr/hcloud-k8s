@@ -2,6 +2,7 @@
 - import_tasks: containerd.yaml
 - import_tasks: kubelet.yaml
 - import_tasks: tools.yaml
+- import_tasks: hosts.yaml
 - import_tasks: initialize.yaml
 - import_tasks: tool_config.yaml
 - import_tasks: ansible.yaml
