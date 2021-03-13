@@ -6,6 +6,11 @@ variable "cluster_workerlb_locations" {
   type = list(string)
 }
 
+variable "cluster_workerlb_ports" {
+  type = list(number)
+  default = [80, 443]
+}
+
 locals {
   cluster_workerlb_count = length(var.cluster_workerlb_types)
 }
@@ -48,34 +53,17 @@ resource "hcloud_load_balancer_target" "workerlb_target" {
   ]
 }
 
-resource "hcloud_load_balancer_service" "workerlb_service_http" {
-  count            = local.cluster_workerlb_count
-  load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
+resource "hcloud_load_balancer_service" "workerlb_service" {
+  count            = local.cluster_workerlb_count * length(var.cluster_workerlb_ports)
+  load_balancer_id = hcloud_load_balancer.workerlb[floor(count.index / length(var.cluster_workerlb_ports))].id
   protocol         = "tcp"
-  listen_port      = 80
-  destination_port = 80
+  listen_port      = var.cluster_workerlb_ports[count.index % length(var.cluster_workerlb_ports)]
+  destination_port = var.cluster_workerlb_ports[count.index % length(var.cluster_workerlb_ports)]
   proxyprotocol    = true
 
   health_check {
     protocol = "tcp"
-    port     = 80
-    interval = 10
-    timeout  = 5
-    retries  = 3
-  }
-}
-
-resource "hcloud_load_balancer_service" "workerlb_service_https" {
-  count            = local.cluster_workerlb_count
-  load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
-  protocol         = "tcp"
-  listen_port      = 443
-  destination_port = 443
-  proxyprotocol    = true
-
-  health_check {
-    protocol = "tcp"
-    port     = 443
+    port     = var.cluster_workerlb_ports[count.index % length(var.cluster_workerlb_ports)]
     interval = 10
     timeout  = 5
     retries  = 3
