@@ -1,0 +1,13 @@
+- when:
+    - inventory_hostname == k8s_initializer
+    - k8s_install_cert_manager
+  block:
+    - name: Install cert-manager
+      loop:
+        - cert-manager-ns.yaml
+        - cert-manager.yaml
+        - cert-manager-issuers.yaml
+      k8s:
+        inline: |
+          {{ lookup('template', 'cert-manager/' + item) }}
+        wait: true

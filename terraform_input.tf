@@ -12,6 +12,11 @@ variable "cluster_ingress" {}
 variable "cluster_cni" {}
 variable "registry_mirrors" {}
 
+variable "install_cert_manager" {
+  type = bool
+  default = true
+}
+
 variable "cluster_authorized_ssh_keys" {
   type = list(string)
 }
