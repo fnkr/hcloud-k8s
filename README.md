@@ -13,7 +13,8 @@ This repository contains a Terraform module and Ansible playbook to provision
 * Uses Hetzner Cloud Networks for all traffic between nodes
 * Uses Cilium with native routing through Hetzner Cloud Networks
 * Creates Hetzner Cloud Load Balancer for traffic to K8s API
-* Creates Hetzner Cloud Load Balancer for traffic to worker nodes (ingress) 
+* Creates Hetzner Cloud Load Balancer for traffic to worker nodes (ingress)
+* Creates Hetzner Cloud Firewall to restrict inbound traffic to servers
 * Installs [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) as DaemonSet (optional)
 * Installs [cert-manager](https://cert-manager.io/) (optional)
 
