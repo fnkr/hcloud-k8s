@@ -54,6 +54,8 @@ Change at least the following values:
 `hcloud_token`: Hetzner Cloud API token created during step 1  
 `cluster_authorized_ssh_keys`: Name of the SSH key added to Hetzner Cloud during step 2
 
+See [VARIABLES.md](VARIABLES.md).
+
 **4)** Provision K8s cluster
 
 ```

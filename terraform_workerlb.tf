@@ -1,9 +1,16 @@
 variable "cluster_workerlb_types" {
-  type = list(string)
+  type    = list(string)
+  default = ["lb11", "lb11"]
 }
 
 variable "cluster_workerlb_locations" {
-  type = list(string)
+  type    = list(string)
+  default = ["nbg1", "fsn1"]
+}
+
+variable "cluster_network_ip_range_workerlb" {
+  type    = string
+  default = "10.8.3.0/24"
 }
 
 locals {

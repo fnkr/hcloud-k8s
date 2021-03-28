@@ -1,9 +1,16 @@
 variable "cluster_controlnode_types" {
-  type = list(string)
+  type    = list(string)
+  default = ["cx21", "cx21", "cx21"]
 }
 
 variable "cluster_controlnode_locations" {
-  type = list(string)
+  type    = list(string)
+  default = ["nbg1", "fsn1", "hel1"]
+}
+
+variable "cluster_network_ip_range_controlnode" {
+  type    = string
+  default = "10.8.4.0/24"
 }
 
 locals {

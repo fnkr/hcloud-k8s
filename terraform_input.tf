@@ -1,19 +1,31 @@
-variable "hcloud_token" {}
-variable "cluster_name" {}
-variable "cluster_network_zone" {}
-variable "cluster_network_ip_range" {}
-variable "cluster_network_ip_range_controllb" {}
-variable "cluster_network_ip_range_workerlb" {}
-variable "cluster_network_ip_range_controlnode" {}
-variable "cluster_network_ip_range_workernode" {}
-variable "cluster_network_ip_range_service" {}
-variable "cluster_network_ip_range_pod" {}
-variable "cluster_ingress" {}
-variable "cluster_cni" {}
-variable "registry_mirrors" {}
+variable "hcloud_token" {
+  type = string
+}
+variable "cluster_name" {
+  type    = string
+  default = "testkube"
+}
+
+variable "cluster_ingress" {
+  type    = string
+  default = "nginx"
+}
+
+variable "cluster_cni" {
+  type    = string
+  default = "cilium"
+}
+
+variable "registry_mirrors" {
+  type = map(list(string))
+
+  default = {
+    "docker.io" : ["https://registry-1.docker.io"]
+  }
+}
 
 variable "install_cert_manager" {
-  type = bool
+  type    = bool
   default = true
 }
 
