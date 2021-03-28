@@ -28,6 +28,13 @@ Make sure the following tools are installed before proceeding:
 * Ansible
 * kubectl
 
+## Backwards compatibility
+
+This project is in early development. It works, but there is still a lot to do. 
+Each commit in the main branch is potentially breaking (might requires recreating the cluster).
+As soon as there is a stable version, it will be tagged `v1.0.0`.
+Tags should then be non-breaking until the next major version bump (`v2.0.0`).
+
 ## Getting started
 
 **1)** Generate Read & Write API token
