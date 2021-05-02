@@ -44,3 +44,11 @@
       when: inventory_hostname in k8s_workernodes
       shell: |
         {{ hostvars[k8s_initializer].k8s_join_worker_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_workernode)|first }}
+
+- name: Remove node-role.kubernetes.io/master taint from control nodes because there are no worker nodes
+  when: k8s_initialize_cluster_result.changed and not k8s_workernodes
+  shell: |
+    set -e
+    {% for node in k8s_controlnodes %}
+    kubectl taint node {{ node }} node-role.kubernetes.io/master-
+    {% endfor %}

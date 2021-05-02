@@ -52,26 +52,30 @@ output "cluster_network_ip_range_pod" {
 }
 
 output "controllb_ipv4_address" {
-  value = hcloud_load_balancer.controllb[0].ipv4
+  value = length(hcloud_load_balancer.controllb) > 1 ? hcloud_load_balancer.controllb[0].ipv4 : hcloud_server.controlnode[0].ipv4_address
 }
 
 output "controllb_k8s_endpoint" {
-  value = "${hcloud_load_balancer.controllb[0].ipv4}:${hcloud_load_balancer_service.controllb_service_https[0].listen_port}"
+  value = "${length(hcloud_load_balancer.controllb) > 1 ? hcloud_load_balancer.controllb[0].ipv4 : hcloud_server.controlnode[0].ipv4_address}:${length(hcloud_load_balancer.controllb) > 1 ? hcloud_load_balancer_service.controllb_service_https[0].listen_port : 6443}"
 }
 
 output "controllb_private_k8s_endpoint_port" {
-  value = hcloud_load_balancer_service.controllb_service_https[0].listen_port
+  value = length(hcloud_load_balancer.controllb) > 1 ? hcloud_load_balancer_service.controllb_service_https[0].listen_port : 6443
 }
 
 output "controllb_private_k8s_endpoint_ips_for_controlnodes" {
-  value = [
+  value = length(hcloud_load_balancer.controllb) > 1 ? [
     for location in var.cluster_controlnode_locations : hcloud_load_balancer_network.controllb_network[try(index(var.cluster_controllb_locations, location), 0)].ip
+    ] : [
+    for location in var.cluster_controlnode_locations : hcloud_server_network.controlnode_network[try(index(var.cluster_controlnode_locations, location), 0)].ip
   ]
 }
 
 output "controllb_private_k8s_endpoint_ips_for_workernodes" {
-  value = [
+  value = length(hcloud_load_balancer.workerlb) > 1 ? [
     for location in var.cluster_workernode_locations : hcloud_load_balancer_network.controllb_network[try(index(var.cluster_controllb_locations, location), 0)].ip
+    ] : [
+    for location in var.cluster_workernode_locations : hcloud_server_network.controlnode_network[try(index(var.cluster_controlnode_locations, location), 0)].ip
   ]
 }
 

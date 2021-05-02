@@ -10,5 +10,5 @@
 - import_tasks: hcloud_csi.yaml
 - import_tasks: cilium.yaml
 - import_tasks: ingress-nginx.yaml
-- import_tasks: cert-manager.yaml
 - import_tasks: add_nodes.yaml
+- import_tasks: cert-manager.yaml

@@ -105,3 +105,26 @@ terraform apply -var-file production.tfvars -state production.tfstate
 TF_STATE=production.tfstate ansible-playbook ansible.yaml
 TF_STATE=production.tfstate ansible-playbook kubeconfig.yaml
 ```
+
+## Minimal cluster
+
+By default, a cluster with multiple control nodes, worker nodes and load balancers will be created.
+If you just want a simple (non-HA) cluster for development/testing,
+you can remove any additional servers and load balancers:
+
+```hcl
+cluster_controlnode_types     = ["cx21"]
+cluster_controlnode_locations = ["nbg1"]
+cluster_workernode_types      = []
+cluster_workernode_locations  = []
+cluster_controllb_types       = []
+cluster_controllb_locations   = []
+cluster_workerlb_types        = []
+cluster_workerlb_locations    = []
+```
+
+* If there are no worker nodes, the master taint will be removed from control nodes automatically,
+  so they can be used as worker nodes. (Not recommended for production.)
+* If there are no control node load balancers, the IP from the first control node in the same location,
+  or the first one if none exists in the same location, will be used.
+  (Breaks high availability, not recommended for production.)
