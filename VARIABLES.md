@@ -197,7 +197,11 @@ Existing ingress controller will not be uninstalled automatically.
 
 ## cluster_cni
 
-Container Network Interface to install. Only `"cilium"` and none (`""`) is currently supported.
+Container Network Interface to install. Supported values:
+
+* `""` - Don't install any CNI
+* `"cilium"` - Install Cilium CNI
+* `"cilium-wireguard"` - Install Cilium CNI and use WireGuard for traffic between pods
 
 Default: `"cilium"`
 
