@@ -3,14 +3,14 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cilium
+  name: "cilium"
   namespace: kube-system
 ---
 # Source: cilium/templates/cilium-operator-serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cilium-operator
+  name: "cilium-operator"
   namespace: kube-system
 ---
 # Source: cilium/templates/cilium-configmap.yaml
@@ -77,6 +77,8 @@ data:
   # bpf-lb-map-max specifies the maximum number of entries in bpf lb service,
   # backend and affinity maps.
   bpf-lb-map-max: "65536"
+  # bpf-lb-bypass-fib-lookup instructs Cilium to enable the FIB lookup bypass
+  # optimization for nodeport reverse NAT handling.
   # Pre-allocation of map entries allows per-packet latency to be reduced, at
   # the expense of up-front memory allocation for the entries in the maps. The
   # default value below will minimize memory usage in the default installation;
@@ -116,18 +118,20 @@ data:
   # wait-bpf-mount makes init container wait until bpf filesystem is mounted
   wait-bpf-mount: "false"
 
-  masquerade: "true"
+  enable-ipv4-masquerade: "true"
+  enable-ipv6-masquerade: "true"
   enable-bpf-masquerade: "true"
 
   enable-xt-socket-fallback: "true"
   install-iptables-rules: "true"
+  install-no-conntrack-iptables-rules: "false"
 
   auto-direct-node-routes: "false"
-  enable-bandwidth-manager: "false"
+  enable-bandwidth-manager: "true"
   enable-local-redirect-policy: "false"
   native-routing-cidr: "{{ k8s_ip_range }}"
-  kube-proxy-replacement:  "probe"
-  kube-proxy-replacement-healthz-bind-address: ""
+
+  kube-proxy-replacement:  "disabled"
   enable-health-check-nodeport: "true"
   node-port-bind-protection: "true"
   enable-auto-protect-node-port-range: "true"
@@ -246,6 +250,7 @@ rules:
   - ciliumlocalredirectpolicies
   - ciliumlocalredirectpolicies/status
   - ciliumlocalredirectpolicies/finalizers
+  - ciliumegressnatpolicies
   verbs:
   - '*'
 ---
@@ -274,6 +279,21 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  # to perform LB IP allocation for BGP
+  - services/status
+  verbs:
+  - update
 - apiGroups:
   - ""
   resources:
@@ -322,12 +342,9 @@ rules:
 # For cilium-operator running in HA mode.
 #
 # Cilium operator running in HA mode requires the use of ResourceLock for Leader Election
-# between mulitple running instances.
+# between multiple running instances.
 # The preferred way of doing this is to use LeasesResourceLock as edits to Leases are less
 # common and fewer objects in the cluster watch "all Leases".
-# The support for leases was introduced in coordination.k8s.io/v1 during Kubernetes 1.14 release.
-# In Cilium we currently don't support HA mode for K8s version < 1.14. This condition make sure
-# that we only authorize access to leases resources in supported K8s versions.
 - apiGroups:
   - coordination.k8s.io
   resources:
@@ -348,7 +365,7 @@ roleRef:
   name: cilium
 subjects:
 - kind: ServiceAccount
-  name: cilium
+  name: "cilium"
   namespace: kube-system
 ---
 # Source: cilium/templates/cilium-operator-clusterrolebinding.yaml
@@ -362,7 +379,7 @@ roleRef:
   name: cilium-operator
 subjects:
 - kind: ServiceAccount
-  name: cilium-operator
+  name: "cilium-operator"
   namespace: kube-system
 ---
 # Source: cilium/templates/cilium-agent-daemonset.yaml
@@ -393,6 +410,19 @@ spec:
         k8s-app: cilium
     spec:
       affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+            - matchExpressions:
+              - key: beta.kubernetes.io/os
+                operator: In
+                values:
+                - linux
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -407,6 +437,18 @@ spec:
         - --config-dir=/tmp/cilium/config-map
         command:
         - cilium-agent
+        startupProbe:
+          httpGet:
+            host: '127.0.0.1'
+            path: /healthz
+            port: 9876
+            scheme: HTTP
+            httpHeaders:
+            - name: "brief"
+              value: "true"
+          failureThreshold: 24
+          periodSeconds: 2
+          successThreshold: 1
         livenessProbe:
           httpGet:
             host: '127.0.0.1'
@@ -417,10 +459,6 @@ spec:
             - name: "brief"
               value: "true"
           failureThreshold: 10
-          # The initial delay for the liveness probe is intentionally large to
-          # avoid an endless kill & restart cycle if in the event that the initial
-          # bootstrapping takes longer than expected.
-          initialDelaySeconds: 120
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 5
@@ -434,7 +472,6 @@ spec:
             - name: "brief"
               value: "true"
           failureThreshold: 3
-          initialDelaySeconds: 5
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 5
@@ -449,18 +486,6 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        - name: CILIUM_FLANNEL_MASTER_DEVICE
-          valueFrom:
-            configMapKeyRef:
-              key: flannel-master-device
-              name: cilium-config
-              optional: true
-        - name: CILIUM_FLANNEL_UNINSTALL_ON_EXIT
-          valueFrom:
-            configMapKeyRef:
-              key: flannel-uninstall-on-exit
-              name: cilium-config
-              optional: true
         - name: CILIUM_CLUSTERMESH_CONFIG
           value: /var/lib/cilium/clustermesh/
         - name: CILIUM_CNI_CHAINING_MODE
@@ -475,7 +500,7 @@ spec:
               key: custom-cni-conf
               name: cilium-config
               optional: true
-        image: quay.io/cilium/cilium:v1.9.4
+        image: "quay.io/cilium/cilium:v1.10.0@sha256:587627d909ffe0418c0bd907516496844867a21812946af82096d367760e4c1e"
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -483,6 +508,7 @@ spec:
               command:
               - "/cni-install.sh"
               - "--enable-debug=false"
+              - "--cni-exclusive=true"
           preStop:
             exec:
               command:
@@ -541,7 +567,7 @@ spec:
               key: wait-bpf-mount
               name: cilium-config
               optional: true
-        image: quay.io/cilium/cilium:v1.9.4
+        image: "quay.io/cilium/cilium:v1.10.0@sha256:587627d909ffe0418c0bd907516496844867a21812946af82096d367760e4c1e"
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -561,8 +587,8 @@ spec:
             memory: 100Mi
       restartPolicy: Always
       priorityClassName: system-node-critical
-      serviceAccount: cilium
-      serviceAccountName: cilium
+      serviceAccount: "cilium"
+      serviceAccountName: "cilium"
       terminationGracePeriodSeconds: 1
       tolerations:
       - operator: Exists
@@ -612,16 +638,12 @@ spec:
           - secret:
               name: hubble-server-certs
               items:
+                - key: ca.crt
+                  path: client-ca.crt
                 - key: tls.crt
                   path: server.crt
                 - key: tls.key
                   path: server.key
-              optional: true
-          - configMap:
-              name: hubble-ca-cert
-              items:
-                - key: ca.crt
-                  path: client-ca.crt
               optional: true
 ---
 # Source: cilium/templates/cilium-operator-deployment.yaml
@@ -634,7 +656,6 @@ metadata:
   name: cilium-operator
   namespace: kube-system
 spec:
-  # We support HA mode only for Kubernetes version > 1.14
   # See docs on ServerCapabilities.LeasesResourceLock in file pkg/k8s/version/version.go
   # for more details.
   replicas: 2
@@ -689,7 +710,7 @@ spec:
               key: debug
               name: cilium-config
               optional: true
-        image: quay.io/cilium/operator-generic:v1.9.4
+        image: "quay.io/cilium/operator-generic:v1.10.0@sha256:65143311a62a95dbe23c69ff2f624e0fdf030eb225e6375d889da66a955dd828"
         imagePullPolicy: IfNotPresent
         name: cilium-operator
         livenessProbe:
@@ -708,8 +729,8 @@ spec:
       hostNetwork: true
       restartPolicy: Always
       priorityClassName: system-cluster-critical
-      serviceAccount: cilium-operator
-      serviceAccountName: cilium-operator
+      serviceAccount: "cilium-operator"
+      serviceAccountName: "cilium-operator"
       tolerations:
       - operator: Exists
       volumes:

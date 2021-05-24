@@ -203,7 +203,7 @@ Container Network Interface to install. Supported values:
 * `"cilium"` - Install Cilium CNI
 * `"cilium-wireguard"` - Install Cilium CNI and use WireGuard for traffic between pods
 
-Default: `"cilium"`
+Default: `"cilium-wireguard"`
 
 Change after cluster initialization:
 Existing CNI will not be uninstalled automatically.

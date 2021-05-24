@@ -13,7 +13,7 @@ variable "cluster_ingress" {
 
 variable "cluster_cni" {
   type    = string
-  default = "cilium"
+  default = "cilium-wireguard"
 }
 
 variable "registry_mirrors" {
