@@ -1,0 +1,23 @@
+- name: Install nginx
+  apt:
+    name: nginx
+
+- name: Configure nginx
+  template:
+    src: nginx/nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify: Restart nginx
+
+- name: Enable nginx
+  systemd:
+    daemon_reload: true
+    name: nginx
+    enabled: true
+
+- name: Start nginx
+  systemd:
+    name: nginx
+    state: started
+  register: k8s_start_nginx_result
+
+- meta: flush_handlers
