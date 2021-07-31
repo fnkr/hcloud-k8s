@@ -1,1 +1,1 @@
-ansible_ssh_common_args: -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null
+ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null{% if lookup('env', 'HTTPS_PROXY') %} -o ProxyCommand='nc -X connect -x {{ lookup('env', 'HTTPS_PROXY') }} %h %p'{% endif %}"
