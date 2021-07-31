@@ -5,7 +5,10 @@ import subprocess
 
 
 def get_terraform_output():
-    tf_cmd = ["terraform", "output", "-json"]
+    terraform = "terraform"
+    if "TF_BIN" in os.environ and os.environ["TF_BIN"]:
+        terraform = os.environ["TF_BIN"]
+    tf_cmd = [terraform, "output", "-json"]
     if "TF_STATE" in os.environ:
         tf_cmd.extend(["-state", os.environ["TF_STATE"]])
     return json.loads(subprocess.check_output(tf_cmd).decode("utf-8"))
