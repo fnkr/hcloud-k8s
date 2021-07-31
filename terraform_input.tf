@@ -1,6 +1,8 @@
 variable "hcloud_token" {
-  type = string
+  type    = string
+  default = null
 }
+
 variable "cluster_name" {
   type    = string
   default = "testkube"

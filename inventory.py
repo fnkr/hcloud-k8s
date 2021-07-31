@@ -40,8 +40,12 @@ def build_inventory(terraform_output):
     terraform_output = get_terraform_output()
 
     # fmt: off
-    inventory["node"]["vars"]["k8s_hcloud_token"] = \
-        terraform_output["hcloud_token"]["value"]
+    try:
+        inventory["node"]["vars"]["k8s_hcloud_token"] = \
+            terraform_output["hcloud_token"]["value"]
+    except KeyError:
+        inventory["node"]["vars"]["k8s_hcloud_token"] = \
+            os.environ["HCLOUD_TOKEN"]
 
     inventory["node"]["vars"]["k8s_cluster_name"] = \
         terraform_output["cluster_name"]["value"]
