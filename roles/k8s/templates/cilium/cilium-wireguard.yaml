@@ -155,6 +155,7 @@ data:
   hubble-tls-client-ca-files: /var/lib/cilium/tls/hubble/client-ca.crt
   ipam: "kubernetes"
   disable-cnp-status-updates: "true"
+  cgroup-root: "/run/cilium/cgroupv2"
 ---
 # Source: cilium/templates/cilium-agent-clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -501,7 +502,7 @@ spec:
               key: custom-cni-conf
               name: cilium-config
               optional: true
-        image: "quay.io/cilium/cilium:v1.10.1@sha256:f5fcdfd4929af5a8903b02da61332eea41dcdb512420b8c807e2e2904270561c"
+        image: "quay.io/cilium/cilium:v1.10.2@sha256:1112a29c8fe04c2a47e5e250112a940c9b81d6700b7e8bba159ab996a05282b9"
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -547,6 +548,26 @@ spec:
           readOnly: true
       hostNetwork: true
       initContainers:
+      # Required to mount cgroup2 filesystem on the underlying Kubernetes node.
+      # We use nsenter command with host's cgroup and mount namespaces enabled.
+      - name: mount-cgroup
+        env:
+          - name: CGROUP_ROOT
+            value: /run/cilium/cgroupv2
+        command:
+          - nsenter
+          - --cgroup=/hostpid1ns/cgroup
+          - --mount=/hostpid1ns/mnt
+          - --
+          - sh
+          - -c
+          - 'mount | grep "$CGROUP_ROOT type cgroup2" || { echo "Mounting cgroup filesystem..."; mount -t cgroup2 none $CGROUP_ROOT; }'
+        image: "quay.io/cilium/cilium:v1.10.2@sha256:1112a29c8fe04c2a47e5e250112a940c9b81d6700b7e8bba159ab996a05282b9"
+        volumeMounts:
+          - mountPath: /hostpid1ns
+            name: host-proc-ns
+        securityContext:
+          privileged: true
       - command:
         - /init-container.sh
         env:
@@ -568,7 +589,7 @@ spec:
               key: wait-bpf-mount
               name: cilium-config
               optional: true
-        image: "quay.io/cilium/cilium:v1.10.1@sha256:f5fcdfd4929af5a8903b02da61332eea41dcdb512420b8c807e2e2904270561c"
+        image: "quay.io/cilium/cilium:v1.10.2@sha256:1112a29c8fe04c2a47e5e250112a940c9b81d6700b7e8bba159ab996a05282b9"
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -579,6 +600,10 @@ spec:
         volumeMounts:
         - mountPath: /sys/fs/bpf
           name: bpf-maps
+          mountPropagation: HostToContainer
+          # Required to mount cgroup filesystem from the host to cilium agent pod
+        - mountPath: /run/cilium/cgroupv2
+          name: cilium-cgroup
           mountPropagation: HostToContainer
         - mountPath: /var/run/cilium
           name: cilium-run
@@ -604,6 +629,16 @@ spec:
           path: /sys/fs/bpf
           type: DirectoryOrCreate
         name: bpf-maps
+      # To mount cgroup2 filesystem on the host
+      - hostPath:
+          path: /proc/1/ns
+          type: Directory
+        name: host-proc-ns
+      # To keep state between restarts / upgrades for cgroup2 filesystem
+      - hostPath:
+          path: /run/cilium/cgroupv2
+          type: DirectoryOrCreate
+        name: cilium-cgroup
       # To install cilium cni plugin in the host
       - hostPath:
           path:  /opt/cni/bin
@@ -711,7 +746,7 @@ spec:
               key: debug
               name: cilium-config
               optional: true
-        image: "quay.io/cilium/operator-generic:v1.10.1@sha256:a1588ee00a15f2f2b419e4acd36bd57d64a5f10eb52d0fd4de689e558a913cd8"
+        image: "quay.io/cilium/operator-generic:v1.10.2@sha256:a88b04cb5895610620da6e90d362af9e512d2baa51a0a0d77ab34186dfb20c68"
         imagePullPolicy: IfNotPresent
         name: cilium-operator
         livenessProbe:
