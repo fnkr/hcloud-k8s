@@ -29,19 +29,6 @@ resource "hcloud_server" "workernode" {
   firewall_ids = [
     hcloud_firewall.nodefw.id
   ]
-
-  connection {
-    type = "ssh"
-    user = "root"
-    host = self.ipv4_address
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      # Use Hetzner mirror instead of the official mirrors (faster downloads)
-      "echo > /etc/apt/sources.list",
-    ]
-  }
 }
 
 resource "hcloud_network_subnet" "network_subnet_workernode" {
