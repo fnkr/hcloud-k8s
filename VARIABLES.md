@@ -208,6 +208,18 @@ Default: `"cilium-wireguard"`
 Change after cluster initialization:
 Existing CNI will not be uninstalled automatically.
 
+## install_hcloud_csi
+
+Install hcloud-csi in cluster.
+
+Default: `true`
+
+## install_cert_manager
+
+Install cert-manager in cluster.
+
+Default: `true`
+
 ## registry_mirrors
 
 Container registry mirrors to use.
