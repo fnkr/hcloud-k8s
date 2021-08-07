@@ -95,6 +95,9 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_registry_mirrors"] = \
         terraform_output["registry_mirrors"]["value"]
 
+    inventory["node"]["vars"]["k8s_install_hcloud_csi"] = \
+        terraform_output["install_hcloud_csi"]["value"]
+
     inventory["node"]["vars"]["k8s_install_cert_manager"] = \
         terraform_output["install_cert_manager"]["value"]
     # fmt: on

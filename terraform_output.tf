@@ -95,6 +95,10 @@ output "registry_mirrors" {
   value = var.registry_mirrors
 }
 
+output "install_hcloud_csi" {
+  value = var.install_hcloud_csi
+}
+
 output "install_cert_manager" {
   value = var.install_cert_manager
 }

@@ -19,4 +19,5 @@ k8s_ingress:
 k8s_ingress_proxy_protocol:
 k8s_cni:
 k8s_registry_mirrors: {}
+k8s_install_hcloud_csi:
 k8s_install_cert_manager: false
