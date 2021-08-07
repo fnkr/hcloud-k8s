@@ -83,6 +83,10 @@ output "cluster_ingress" {
   value = var.cluster_ingress
 }
 
+output "cluster_ingress_proxy_protocol" {
+  value = length(hcloud_load_balancer.workerlb) > 0
+}
+
 output "cluster_cni" {
   value = var.cluster_cni
 }

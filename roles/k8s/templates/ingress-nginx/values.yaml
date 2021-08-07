@@ -4,6 +4,6 @@ controller:
   service:
     type: ""
   config:
-    use-proxy-protocol: true
+    use-proxy-protocol: "{{ 'true' if k8s_ingress_proxy_protocol else 'true' }}"
     hsts-max-age: 63072000
     hsts-include-subdomains: false

@@ -86,6 +86,9 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_ingress"] = \
         terraform_output["cluster_ingress"]["value"]
 
+    inventory["node"]["vars"]["k8s_ingress_proxy_protocol"] = \
+        terraform_output["cluster_ingress_proxy_protocol"]["value"]
+
     inventory["node"]["vars"]["k8s_cni"] = \
         terraform_output["cluster_cni"]["value"]
 
