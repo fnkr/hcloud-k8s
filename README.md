@@ -99,6 +99,13 @@ It will not delete anything created by Kubernetes (e.g. volumes created using pe
 terraform destroy -auto-approve
 ```
 
+Destroy cluster without destroying the infrastructure (factory-reset all servers):
+
+```bash
+export HCLOUD_TOKEN="$(grep ^hcloud_token terraform.tfvars | awk -F '"' '{print $2}')"
+hcloud server list -o noheader -o columns=name | grep ^testkube- | xargs -n 1 hcloud server rebuild --image=ubuntu-20.04
+```
+
 ## Working with multiple state/var files
 
 ```
