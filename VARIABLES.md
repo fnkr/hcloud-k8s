@@ -108,6 +108,13 @@ Change after cluster initialization:
 Changing locations of existing load balancers will cause recreation and new public IP addresses will be assigned.
 Adding load balancers is safe.
 
+## cluster_existing_network_name
+
+Name of an existing Hetzner Cloud Network to be used.
+If left empty, a new one will be created.
+
+default: `""`
+
 ## cluster_network_zone
 
 Zone for Hetzner Cloud Network.

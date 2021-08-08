@@ -56,6 +56,9 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_initializer"] = \
         terraform_output["initializer"]["value"]
 
+    inventory["node"]["vars"]["k8s_network_id"] = \
+        terraform_output["cluster_network_id"]["value"]
+
     inventory["node"]["vars"]["k8s_ip_range"] = \
         terraform_output["cluster_network_ip_range"]["value"]
 

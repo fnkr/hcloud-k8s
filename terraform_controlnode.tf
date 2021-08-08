@@ -33,7 +33,7 @@ resource "hcloud_server" "controlnode" {
 
 resource "hcloud_network_subnet" "network_subnet_controlnode" {
   type         = "cloud"
-  network_id   = hcloud_network.network.id
+  network_id   = data.hcloud_network.network.id
   network_zone = var.cluster_network_zone
   ip_range     = var.cluster_network_ip_range_controlnode
 }
@@ -41,6 +41,6 @@ resource "hcloud_network_subnet" "network_subnet_controlnode" {
 resource "hcloud_server_network" "controlnode_network" {
   count      = local.cluster_controlnode_count
   server_id  = hcloud_server.controlnode[count.index].id
-  network_id = hcloud_network.network.id
+  network_id = data.hcloud_network.network.id
   ip         = cidrhost(hcloud_network_subnet.network_subnet_controlnode.ip_range, count.index + 1)
 }

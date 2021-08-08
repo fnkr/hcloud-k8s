@@ -31,7 +31,7 @@ resource "hcloud_load_balancer" "workerlb" {
 
 resource "hcloud_network_subnet" "network_subnet_workerlb" {
   type         = "cloud"
-  network_id   = hcloud_network.network.id
+  network_id   = data.hcloud_network.network.id
   network_zone = var.cluster_network_zone
   ip_range     = var.cluster_network_ip_range_workerlb
 }
@@ -39,7 +39,7 @@ resource "hcloud_network_subnet" "network_subnet_workerlb" {
 resource "hcloud_load_balancer_network" "workerlb_network" {
   count            = local.cluster_workerlb_count
   load_balancer_id = hcloud_load_balancer.workerlb[count.index].id
-  network_id       = hcloud_network.network.id
+  network_id       = data.hcloud_network.network.id
   ip               = cidrhost(hcloud_network_subnet.network_subnet_workerlb.ip_range, count.index + 1)
 }
 
