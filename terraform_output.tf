@@ -106,3 +106,7 @@ output "install_hcloud_csi" {
 output "install_cert_manager" {
   value = var.install_cert_manager
 }
+
+output "install_ceph_client" {
+  value = var.install_ceph_client
+}

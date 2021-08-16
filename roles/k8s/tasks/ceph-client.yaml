@@ -1,0 +1,4 @@
+- name: Install Ceph client
+  when: k8s_install_ceph_client
+  apt:
+    name: ceph-common

@@ -18,6 +18,7 @@ This repository contains a Terraform module and Ansible playbook to provision
 * Creates Hetzner Cloud Firewall to restrict inbound traffic to servers
 * Installs [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) as DaemonSet (optional)
 * Installs [cert-manager](https://cert-manager.io/) (optional)
+* Installs Ceph client (optional)
 
 ## Prerequisites
 

@@ -227,6 +227,12 @@ Install cert-manager in cluster.
 
 Default: `true`
 
+## install_ceph_client
+
+Install Ceph client in cluster.
+
+Default: `false`
+
 ## registry_mirrors
 
 Container registry mirrors to use.

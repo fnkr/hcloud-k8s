@@ -12,3 +12,4 @@
 - import_tasks: ingress-nginx.yaml
 - import_tasks: add_nodes.yaml
 - import_tasks: cert-manager.yaml
+- import_tasks: ceph-client.yaml

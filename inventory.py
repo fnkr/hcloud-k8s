@@ -103,6 +103,9 @@ def build_inventory(terraform_output):
 
     inventory["node"]["vars"]["k8s_install_cert_manager"] = \
         terraform_output["install_cert_manager"]["value"]
+
+    inventory["node"]["vars"]["k8s_install_ceph_client"] = \
+        terraform_output["install_ceph_client"]["value"]
     # fmt: on
 
     for group in [

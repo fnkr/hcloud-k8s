@@ -36,6 +36,11 @@ variable "install_cert_manager" {
   default = true
 }
 
+variable "install_ceph_client" {
+  type    = bool
+  default = false
+}
+
 variable "cluster_authorized_ssh_keys" {
   type = list(string)
 }
