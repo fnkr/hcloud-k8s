@@ -15,7 +15,7 @@ Only applies to new servers.
 
 Will be used as prefix/name for servers, networks, load balancers, firewalls, ... 
 
-Default: `"terrakube"`
+Default: `"testkube"`
 
 Change after cluster initialization:
 Breaks cluster.
