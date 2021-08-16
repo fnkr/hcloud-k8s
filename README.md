@@ -75,10 +75,16 @@ ansible-playbook ansible.yaml
 
 **5)** Update kube client configuration
 
-This will update your local `~/.kube/config`.
+This will add the cluster to your local `~/.kube/config`.
 
 ```
 ansible-playbook kubeconfig.yaml
+```
+
+Test if connection works. Replace `testkube` with the `cluster_name` of your cluster.
+
+```
+kubectl --context testkube get all --all-namespaces
 ```
 
 **6)** Watch your new cluster
