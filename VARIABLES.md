@@ -219,13 +219,13 @@ Existing CNI will not be uninstalled automatically.
 
 Install hcloud-csi in cluster.
 
-Default: `true`
+Default: `false`
 
 ## install_cert_manager
 
 Install cert-manager in cluster.
 
-Default: `true`
+Default: `false`
 
 ## install_ceph_client
 

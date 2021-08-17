@@ -28,12 +28,12 @@ variable "registry_mirrors" {
 
 variable "install_hcloud_csi" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "install_cert_manager" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "install_ceph_client" {
