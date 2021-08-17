@@ -9,7 +9,7 @@ Example: `["mykey"]`
 Default: none
 
 Change after cluster initialization:
-Only applies to new servers.
+Only applied to newly created servers.
 
 ## cluster_name
 
@@ -221,17 +221,27 @@ Install hcloud-csi in cluster.
 
 Default: `false`
 
+Change after cluster initialization:
+hcloud-csi will be installed when the setting is enabled,
+but not uninstalled when the setting is disabled.
+
 ## install_cert_manager
 
 Install cert-manager in cluster.
 
 Default: `false`
 
+Change after cluster initialization:
+cert-manager will be installed when the setting is enabled,
+but not uninstalled when the setting is disabled.
+
 ## install_ceph_client
 
 Install Ceph client in cluster.
 
 Default: `false`
+Ceph client will be installed when the setting is enabled,
+but not uninstalled when the setting is disabled.
 
 ## registry_mirrors
 

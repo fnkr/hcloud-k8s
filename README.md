@@ -3,9 +3,9 @@
 This repository contains a Terraform module and Ansible playbook to provision
 [Kubernetes](https://kubernetes.io) clusters on [Hetzner Cloud](https://hetzner.cloud).
 
-## Topology
+## Features
 
-* High availability: creates three control nodes and three worker nodes (by default)
+* High availability: creates three control nodes and three worker nodes
 * etcd stacked on control plane nodes
 * containerd container runtime
 * Installs [Hetzner Cloud Controller Manager](https://github.com/hetznercloud/hcloud-cloud-controller-manager)
@@ -16,9 +16,12 @@ This repository contains a Terraform module and Ansible playbook to provision
 * Creates Hetzner Cloud Load Balancer for traffic to K8s API
 * Creates Hetzner Cloud Load Balancer for traffic to worker nodes (ingress)
 * Creates Hetzner Cloud Firewall to restrict inbound traffic to servers
-* Installs [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) as DaemonSet (optional)
-* Installs [cert-manager](https://cert-manager.io/) (optional)
-* Installs Ceph client (optional)
+* Installs [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) as DaemonSet
+* Installs [cert-manager](https://cert-manager.io/)
+* Installs Ceph client
+
+Many features are optional, customizable and might be turned on or off by default.
+See [VARIABLES.md](VARIABLES.md) for details.
 
 ## Prerequisites
 
@@ -64,7 +67,15 @@ Change at least the following values:
 `hcloud_token`: Hetzner Cloud API token created during step 1  
 `cluster_authorized_ssh_keys`: Name of the SSH key added to Hetzner Cloud during step 2
 
-See [VARIABLES.md](VARIABLES.md).
+Turn on/off features, customize topology, ..., e.g.:
+
+```hcl
+install_hcloud_csi   = true
+install_ceph_client  = true
+install_cert_manager = true
+```
+
+See [VARIABLES.md](VARIABLES.md) for details.
 
 **4)** Provision K8s cluster
 
