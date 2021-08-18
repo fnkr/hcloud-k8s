@@ -98,6 +98,9 @@ def build_inventory(terraform_output):
     inventory["node"]["vars"]["k8s_registry_mirrors"] = \
         terraform_output["registry_mirrors"]["value"]
 
+    inventory["node"]["vars"]["k8s_install_hcloud_ccm"] = \
+        terraform_output["install_hcloud_ccm"]["value"]
+
     inventory["node"]["vars"]["k8s_install_hcloud_csi"] = \
         terraform_output["install_hcloud_csi"]["value"]
 
@@ -113,17 +116,29 @@ def build_inventory(terraform_output):
             terraform_output["controlnode_names"]["value"],
             terraform_output["controlnode_ipv4_addresses"]["value"],
             "controlnode",
+            terraform_output["cluster_network_ip_range_controlnode_pod"]["value"],
+            terraform_output["controlnode_instance_types"]["value"],
+            terraform_output["controlnode_regions"]["value"],
+            terraform_output["controlnode_zones"]["value"],
         ],
         [
             terraform_output["workernode_names"]["value"],
             terraform_output["workernode_ipv4_addresses"]["value"],
             "workernode",
+            terraform_output["cluster_network_ip_range_workernode_pod"]["value"],
+            terraform_output["workernode_instance_types"]["value"],
+            terraform_output["workernode_regions"]["value"],
+            terraform_output["workernode_zones"]["value"],
         ],
     ]:
         for node in range(len(group[0])):
             node_name = group[0][node]
             node_ipv4_address = group[1][node]
             node_group = group[2]
+            node_pod_cidr = group[3][node] if group[3] else None
+            node_instance_type = group[4][node]
+            node_region = group[5][node]
+            node_zone = group[6][node]
 
             inventory["_meta"]["hostvars"][node_name] = {
                 "ansible_host": node_ipv4_address,
@@ -134,6 +149,10 @@ def build_inventory(terraform_output):
                 "k8s_private_control_plane_endpoint_port": terraform_output[
                     "controllb_private_k8s_endpoint_port"
                 ]["value"],
+                "k8s_ip_range_node_pod": node_pod_cidr,
+                "k8s_instance_type": node_instance_type,
+                "k8s_region": node_region,
+                "k8s_zone": node_zone,
             }
             inventory[node_group]["hosts"].append(node_name)
             inventory["node"]["vars"][f"k8s_{node_group}s"].append(node_name)

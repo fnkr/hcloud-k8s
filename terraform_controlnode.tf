@@ -10,7 +10,7 @@ variable "cluster_controlnode_locations" {
 
 variable "cluster_network_ip_range_controlnode" {
   type    = string
-  default = "10.8.4.0/24"
+  default = "10.8.10.0/24"
 }
 
 locals {
@@ -43,4 +43,11 @@ resource "hcloud_server_network" "controlnode_network" {
   server_id  = hcloud_server.controlnode[count.index].id
   network_id = data.hcloud_network.network.id
   ip         = cidrhost(hcloud_network_subnet.network_subnet_controlnode.ip_range, count.index + 1)
+}
+
+resource "hcloud_network_route" "controlnode_pods" {
+  count       = var.install_hcloud_ccm ? 0 : local.cluster_controlnode_count
+  network_id  = data.hcloud_network.network.id
+  destination = cidrsubnet(cidrsubnet(var.cluster_network_ip_range_pod, 1, 0), 8, count.index + 1)
+  gateway     = hcloud_server_network.controlnode_network[count.index].ip
 }

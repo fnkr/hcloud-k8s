@@ -26,6 +26,11 @@ variable "registry_mirrors" {
   }
 }
 
+variable "install_hcloud_ccm" {
+  type    = bool
+  default = false
+}
+
 variable "install_hcloud_csi" {
   type    = bool
   default = false

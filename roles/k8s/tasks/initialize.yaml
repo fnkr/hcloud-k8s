@@ -8,7 +8,7 @@
         kubeadm init
         --kubernetes-version=v{{ k8s_version|quote }}
         --service-cidr={{ k8s_ip_range_service|quote }}
-        --pod-network-cidr={{ k8s_ip_range_pod|quote }}
+        {% if k8s_install_hcloud_ccm %}--pod-network-cidr={{ k8s_ip_range_pod|quote }}{% endif %}
         --control-plane-endpoint={{ k8s_private_control_plane_endpoint|quote }}
         {% for san in k8s_apiserver_cert_extra_sans %}--apiserver-cert-extra-sans={{ san|quote }}{% if not loop.last %} {% endif %}{% endfor %}
         --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}

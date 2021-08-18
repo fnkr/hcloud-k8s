@@ -161,7 +161,7 @@ Should be safe (untested).
 
 IP range for control nodes.
 
-Default: `"10.8.4.0/24"`
+Default: `"10.8.10.0/24"`
 
 Change after cluster initialization:
 Breaks cluster.
@@ -170,7 +170,7 @@ Breaks cluster.
 
 IP range for worker nodes.
 
-Default: `"10.8.5.0/24"`
+Default: `"10.8.11.0/24"`
 
 Change after cluster initialization:
 Breaks cluster.
@@ -179,7 +179,7 @@ Breaks cluster.
 
 Kubernetes service CIDR.
 
-Default: `"10.10.0.0/16"`
+Default: `"10.9.0.0/16"`
 
 Change after cluster initialization:
 Breaks cluster.
@@ -188,7 +188,7 @@ Breaks cluster.
 
 Kubernetes Pod CIDR.
 
-Default: `"10.11.0.0/16"`
+Default: `"10.10.0.0/15"`
 
 Change after cluster initialization:
 Breaks cluster.
@@ -214,6 +214,27 @@ Default: `"cilium-wireguard"`
 
 Change after cluster initialization:
 Existing CNI will not be uninstalled automatically.
+
+## install_hcloud_ccm
+
+Install [hcloud-ccm](https://github.com/hetznercloud/hcloud-cloud-controller-manager) in the cluster.
+
+If enabled:
+
+* hcloud-ccm will be installed in the cluster.
+* hcloud-ccm will be configured to use the Hetzner Cloud API token also used by Terraform.
+* hcloud-ccm will take care of assigning pod CIDRs, adding routes to Hetzner Cloud, initializing nodes, etc.
+
+If disabled:
+
+* hcloud-ccm will not be installed in the cluster.
+* Terraform will assign pod CIDRs and add routes to Hetzner Cloud.
+* Ansible will initialize each node and set pod CIDR, labels, remove uninitialized taint, etc.
+
+Default: `false`
+
+Change after cluster initialization:
+Breaks cluster.
 
 ## install_hcloud_csi
 

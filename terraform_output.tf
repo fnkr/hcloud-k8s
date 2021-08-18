@@ -31,6 +31,30 @@ output "workernode_ipv4_addresses" {
   value = hcloud_server.workernode.*.ipv4_address
 }
 
+output "controlnode_instance_types" {
+  value = hcloud_server.controlnode.*.server_type
+}
+
+output "workernode_instance_types" {
+  value = hcloud_server.workernode.*.server_type
+}
+
+output "controlnode_regions" {
+  value = hcloud_server.controlnode.*.location
+}
+
+output "workernode_regions" {
+  value = hcloud_server.workernode.*.location
+}
+
+output "controlnode_zones" {
+  value = hcloud_server.controlnode.*.datacenter
+}
+
+output "workernode_zones" {
+  value = hcloud_server.workernode.*.datacenter
+}
+
 output "cluster_network_id" {
   value = data.hcloud_network.network.id
 }
@@ -53,6 +77,14 @@ output "cluster_network_ip_range_service" {
 
 output "cluster_network_ip_range_pod" {
   value = var.cluster_network_ip_range_pod
+}
+
+output "cluster_network_ip_range_controlnode_pod" {
+  value = hcloud_network_route.controlnode_pods.*.destination
+}
+
+output "cluster_network_ip_range_workernode_pod" {
+  value = hcloud_network_route.workernode_pods.*.destination
 }
 
 output "controllb_ipv4_address" {
@@ -97,6 +129,10 @@ output "cluster_cni" {
 
 output "registry_mirrors" {
   value = var.registry_mirrors
+}
+
+output "install_hcloud_ccm" {
+  value = var.install_hcloud_ccm
 }
 
 output "install_hcloud_csi" {

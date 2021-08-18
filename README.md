@@ -70,6 +70,7 @@ Change at least the following values:
 Turn on/off features, customize topology, ..., e.g.:
 
 ```hcl
+install_hcloud_ccm   = true
 install_hcloud_csi   = true
 install_ceph_client  = true
 install_cert_manager = true

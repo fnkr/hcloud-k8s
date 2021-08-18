@@ -15,12 +15,12 @@ variable "cluster_network_ip_range" {
 
 variable "cluster_network_ip_range_service" {
   type    = string
-  default = "10.10.0.0/16"
+  default = "10.9.0.0/16"
 }
 
 variable "cluster_network_ip_range_pod" {
   type    = string
-  default = "10.11.0.0/16"
+  default = "10.10.0.0/15"
 }
 
 data "hcloud_network" "network" {

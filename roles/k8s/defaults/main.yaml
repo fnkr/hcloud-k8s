@@ -2,12 +2,16 @@ k8s_version:
 k8s_initializer:
 k8s_controlnodes:
 k8s_workernodes:
+k8s_instance_type:
+k8s_region:
+k8s_zone:
 k8s_network_id:
 k8s_ip_range:
 k8s_ip_range_controlnode:
 k8s_ip_range_workernode:
 k8s_ip_range_service:
 k8s_ip_range_pod:
+k8s_ip_range_node_pod:
 k8s_control_plane_endpoint:
 k8s_private_control_plane_endpoint_ip:
 k8s_private_control_plane_endpoint_port:
@@ -20,6 +24,7 @@ k8s_ingress:
 k8s_ingress_proxy_protocol:
 k8s_cni:
 k8s_registry_mirrors: {}
+k8s_install_hcloud_ccm:
 k8s_install_hcloud_csi:
 k8s_install_cert_manager: false
 k8s_install_ceph_client:
