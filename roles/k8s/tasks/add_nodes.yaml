@@ -53,7 +53,20 @@
     kubectl taint node {{ node }} node-role.kubernetes.io/master-
     {% endfor %}
 
-- name: Set node info and remove uninitialized taint
+- name: Set instance type, region and zone
+  delegate_to: "{{ k8s_initializer }}"
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Node
+      metadata:
+        name: "{{ inventory_hostname }}"
+        labels:
+          node.kubernetes.io/instance-type: "{{ k8s_instance_type }}"
+          topology.kubernetes.io/region: "{{ k8s_region }}"
+          topology.kubernetes.io/zone: "{{ k8s_zone }}"
+
+- name: Set pod CIDR and remove uninitialized taint
   when:
     - not k8s_install_hcloud_ccm
     - (k8s_initializer and k8s_initialize_cluster_result.changed) or (not k8s_node_initialized_result.stat.exists)
@@ -61,7 +74,4 @@
   shell: |
     set -e
     kubectl patch node {{ inventory_hostname }} -p '{"spec":{"podCIDR":"{{ k8s_ip_range_node_pod }}"}}'
-    kubectl label node {{ inventory_hostname }} node.kubernetes.io/instance-type={{ k8s_instance_type|quote }}
-    kubectl label node {{ inventory_hostname }} topology.kubernetes.io/region={{ k8s_region|quote }}
-    kubectl label node {{ inventory_hostname }} topology.kubernetes.io/zone={{ k8s_zone|quote }}
     kubectl taint node {{ inventory_hostname }} node.cloudprovider.kubernetes.io/uninitialized-
