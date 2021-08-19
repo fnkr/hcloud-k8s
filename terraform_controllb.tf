@@ -8,6 +8,11 @@ variable "cluster_controllb_locations" {
   default = ["nbg1", "fsn1", "hel1"]
 }
 
+variable "cluster_controllb_disable_public_network" {
+  type    = bool
+  default = false
+}
+
 variable "cluster_network_ip_range_controllb" {
   type    = string
   default = "10.8.2.0/24"
@@ -37,10 +42,11 @@ resource "hcloud_network_subnet" "network_subnet_controllb" {
 }
 
 resource "hcloud_load_balancer_network" "controllb_network" {
-  count            = local.cluster_controllb_count
-  load_balancer_id = hcloud_load_balancer.controllb[count.index].id
-  network_id       = data.hcloud_network.network.id
-  ip               = cidrhost(hcloud_network_subnet.network_subnet_controllb.ip_range, count.index + 1)
+  count                   = local.cluster_controllb_count
+  load_balancer_id        = hcloud_load_balancer.controllb[count.index].id
+  network_id              = data.hcloud_network.network.id
+  ip                      = cidrhost(hcloud_network_subnet.network_subnet_controllb.ip_range, count.index + 1)
+  enable_public_interface = !var.cluster_controllb_disable_public_network
 }
 
 resource "hcloud_load_balancer_target" "controllb_target" {

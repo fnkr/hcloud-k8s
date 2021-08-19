@@ -87,6 +87,16 @@ Removing a load balancer will break nodes using that load balancer.
 Only newly created nodes will use new load balancers.
 Changing locations of existing load balancers will cause recreation.
 
+## cluster_controllb_disable_public_network
+
+Disable the public (internet-facing) network interface on all control node load balancers.
+
+Default: `false`
+
+Change after cluster initialization:
+Breaks cluster because of this bug: https://github.com/hetznercloud/terraform-provider-hcloud/issues/429
+Workaround: manually enable/disable the public interface using the Cloud Console before running Terraform.
+
 ## cluster_workerlb_types
 
 Load balancer types for worker node load balancers.
