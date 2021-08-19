@@ -28,3 +28,4 @@ k8s_install_hcloud_ccm:
 k8s_install_hcloud_csi:
 k8s_install_cert_manager: false
 k8s_install_ceph_client:
+k8s_install_reloader:

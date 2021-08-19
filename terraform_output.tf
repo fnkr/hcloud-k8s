@@ -146,3 +146,7 @@ output "install_cert_manager" {
 output "install_ceph_client" {
   value = var.install_ceph_client
 }
+
+output "install_reloader" {
+  value = var.install_reloader
+}

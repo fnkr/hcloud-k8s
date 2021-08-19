@@ -264,6 +264,14 @@ Default: `false`
 Ceph client will be installed when the setting is enabled,
 but not uninstalled when the setting is disabled.
 
+## install_reloader
+
+Install [Reloader](https://github.com/stakater/Reloader) in cluster.
+
+Default: `false`
+Reloader will be installed when the setting is enabled,
+but not uninstalled when the setting is disabled.
+
 ## registry_mirrors
 
 Container registry mirrors to use.

@@ -46,6 +46,11 @@ variable "install_ceph_client" {
   default = false
 }
 
+variable "install_reloader" {
+  type    = bool
+  default = false
+}
+
 variable "cluster_authorized_ssh_keys" {
   type = list(string)
 }
