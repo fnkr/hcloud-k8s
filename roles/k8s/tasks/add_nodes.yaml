@@ -69,7 +69,8 @@
 - name: Set pod CIDR and remove uninitialized taint
   when:
     - not k8s_install_hcloud_ccm
-    - (k8s_initializer and k8s_initialize_cluster_result.changed) or (not k8s_node_initialized_result.stat.exists)
+    - inventory_hostname != k8s_initializer or k8s_initialize_cluster_result.changed
+    - inventory_hostname == k8s_initializer or not k8s_node_initialized_result.stat.exists
   delegate_to: "{{ k8s_initializer }}"
   shell: |
     set -e
