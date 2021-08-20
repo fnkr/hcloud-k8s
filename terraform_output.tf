@@ -92,7 +92,7 @@ output "controllb_ipv4_address" {
 }
 
 output "controllb_k8s_endpoint" {
-  value = "${length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer.controllb[0].ipv4 : hcloud_server.controlnode[0].ipv4_address}:${length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer_service.controllb_service_https[0].listen_port : 6443}"
+  value = "${length(hcloud_load_balancer.controllb) > 0 && !var.cluster_controllb_disable_public_network ? hcloud_load_balancer.controllb[0].ipv4 : hcloud_server.controlnode[0].ipv4_address}:${length(hcloud_load_balancer.controllb) > 0 && !var.cluster_controllb_disable_public_network ? hcloud_load_balancer_service.controllb_service_https[0].listen_port : 6443}"
 }
 
 output "controllb_private_k8s_endpoint_port" {
