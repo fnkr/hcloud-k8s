@@ -19,7 +19,7 @@ locals {
 
 resource "hcloud_server" "workernode" {
   count       = local.cluster_workernode_count
-  name        = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
+  name        = format(local.cluster_resource_name, local.cluster_resource_name_workernode, count.index + 1)
   image       = var.cluster_node_image
   server_type = var.cluster_workernode_types[count.index]
   location    = var.cluster_workernode_locations[count.index]

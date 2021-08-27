@@ -20,6 +20,17 @@ Default: `"testkube"`
 Change after cluster initialization:
 Breaks cluster.
 
+## cluster_domain
+
+Use FQDNs for servers and load balancers.
+Each resource with a FQDN will be a subdomain under this domain.
+Reverse DNS entries will be created too.
+
+Default: `""`
+
+Change after cluster initialization:
+Untested.
+
 ## cluster_controlnode_types
 
 Server types for control nodes.

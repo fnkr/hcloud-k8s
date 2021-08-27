@@ -8,6 +8,11 @@ variable "cluster_name" {
   default = "testkube"
 }
 
+variable "cluster_domain" {
+  type    = string
+  default = ""
+}
+
 variable "cluster_ingress" {
   type    = string
   default = "nginx"

@@ -19,7 +19,7 @@ locals {
 
 resource "hcloud_load_balancer" "workerlb" {
   count              = local.cluster_workerlb_count
-  name               = "${var.cluster_name}-worker-${format("%03d", count.index + 1)}"
+  name               = format(local.cluster_resource_name, local.cluster_resource_name_workerlb, count.index + 1)
   load_balancer_type = var.cluster_workerlb_types[count.index]
   location           = var.cluster_workerlb_locations[count.index]
   labels             = merge(local.labels, local.worker_labels)
