@@ -87,8 +87,12 @@ output "cluster_network_ip_range_workernode_pod" {
   value = hcloud_network_route.workernode_pods.*.destination
 }
 
-output "controllb_ipv4_address" {
-  value = length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer.controllb[0].ipv4 : hcloud_server.controlnode[0].ipv4_address
+output "controllb_ipv4_addresses" {
+  value = length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer.controllb.*.ipv4 : hcloud_server.controlnode.*.ipv4_address
+}
+
+output "controllb_ipv6_addresses" {
+  value = length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer.controllb.*.ipv6 : hcloud_server.controlnode.*.ipv6_address
 }
 
 output "controllb_k8s_endpoint" {
