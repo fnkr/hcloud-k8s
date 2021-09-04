@@ -37,13 +37,13 @@
       throttle: 1
       when: inventory_hostname in k8s_controlnodes
       shell: |
-        {{ hostvars[k8s_initializer].k8s_join_controller_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }}
+        {{ hostvars[k8s_initializer].k8s_join_controller_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_controlnode)|first }} --node-name={{ inventory_hostname }}
 
     - name: Add worker nodes to cluster
       throttle: 1
       when: inventory_hostname in k8s_workernodes
       shell: |
-        {{ hostvars[k8s_initializer].k8s_join_worker_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_workernode)|first }}
+        {{ hostvars[k8s_initializer].k8s_join_worker_command_result.stdout }} --apiserver-advertise-address={{ ansible_all_ipv4_addresses|ipaddr(k8s_ip_range_workernode)|first }} --node-name={{ inventory_hostname }}
 
 - name: Remove node-role.kubernetes.io/master taint from control nodes because there are no worker nodes
   when: k8s_initialize_cluster_result.changed and not k8s_workernodes
