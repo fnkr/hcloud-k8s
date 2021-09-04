@@ -105,8 +105,7 @@ Disable the public (internet-facing) network interface on all control node load 
 Default: `false`
 
 Change after cluster initialization:
-Breaks cluster because of this bug: https://github.com/hetznercloud/terraform-provider-hcloud/issues/429
-Workaround: manually enable/disable the public interface using the Cloud Console before running Terraform.
+Safe.
 
 ## cluster_workerlb_types
 
