@@ -18,13 +18,14 @@ locals {
 }
 
 resource "hcloud_server" "controlnode" {
-  count       = local.cluster_controlnode_count
-  name        = format(local.cluster_resource_name, local.cluster_resource_name_controlnode, count.index + 1)
-  image       = var.cluster_node_image
-  server_type = var.cluster_controlnode_types[count.index]
-  location    = var.cluster_controlnode_locations[count.index]
-  ssh_keys    = var.cluster_authorized_ssh_keys
-  labels      = merge(local.labels, local.control_labels, local.node_labels, count.index == 0 ? local.initializer_labels : null)
+  count              = local.cluster_controlnode_count
+  name               = format(local.cluster_resource_name, local.cluster_resource_name_controlnode, count.index + 1)
+  image              = var.cluster_node_image
+  server_type        = var.cluster_controlnode_types[count.index]
+  location           = var.cluster_controlnode_locations[count.index]
+  placement_group_id = var.cluster_use_placement_group ? hcloud_placement_group.placement_group.0.id : null
+  ssh_keys           = var.cluster_authorized_ssh_keys
+  labels             = merge(local.labels, local.control_labels, local.node_labels, count.index == 0 ? local.initializer_labels : null)
 
   firewall_ids = [
     hcloud_firewall.nodefw.id

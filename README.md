@@ -10,6 +10,7 @@ This repository contains a Terraform module and Ansible playbook to provision
 * containerd container runtime
 * Installs [Hetzner Cloud Controller Manager](https://github.com/hetznercloud/hcloud-cloud-controller-manager)
 * Installs [Hetzner Cloud Container Storage Interface](https://github.com/hetznercloud/csi-driver)
+* Uses placement groups to spread servers across a datacenter
 * Uses Hetzner Cloud Networks for all traffic between nodes
 * Uses Cilium with native routing through Hetzner Cloud Networks
 * Uses Cilium's WireGuard integration to encrypt traffic between pods

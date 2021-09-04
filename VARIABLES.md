@@ -302,3 +302,34 @@ Default: `{"docker.io" : ["https://registry-1.docker.io"]}`
 
 Change after cluster initialization:
 Should be safe. Restarts containerd.
+
+## cluster_use_placement_group
+
+Use placement groups.
+
+Default: `true`
+
+Change after cluster initialization:
+Servers must be stopped to add placement groups.
+
+## cluster_existing_placement_group_name
+
+WARNING: Setting is currently ignored because of this bug:
+https://github.com/hetznercloud/terraform-provider-hcloud/issues/459
+
+Name of an existing placement group to use.
+A new placement group will be created when this is empty and `cluster_use_placement_group` is `true`.
+
+Default: `""`
+
+Change after cluster initialization:
+Servers must be stopped to change placement groups.
+
+## cluster_placement_group_type
+
+Type of placement group to create.
+
+Default: `"spread"`
+
+Change after cluster initialization:
+Need to disable placement groups first.
