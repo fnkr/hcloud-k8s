@@ -134,6 +134,24 @@ TF_STATE=production.tfstate ansible-playbook ansible.yaml
 TF_STATE=production.tfstate ansible-playbook kubeconfig.yaml
 ```
 
+## Connecting to control node load balancer via internal network and proxy
+
+If the public interface of the control node load balancer is disabled
+it might be useful to connect through a proxy. The installation of such a proxy is not part of this project.
+
+The proxy would be located in the same internal network that the control node load balancer is in.
+The `kubeconfig.yaml` playbook (which is a helper playbook that updates your local kube config)
+supports this using the `KUBE_PROXY` environment variable.
+
+If `KUBE_PROXY` is set, Kubernetes clients will be configured to make connections to the cluster
+through the specified proxy. If the option is used, the playbook will also extend the embedded trust store
+for this Kubernetes configuration with the current set of certificates present in your local trust store
+in order to make HTTPS proxies work.
+
+```
+KUBE_PROXY=https://user:token@proxy.example.com ansible-playbook kubeconfig.yaml
+```
+
 ## Minimal cluster
 
 By default, a cluster with multiple control nodes, worker nodes and load balancers will be created.
