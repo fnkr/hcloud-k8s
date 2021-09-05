@@ -4,7 +4,8 @@ all: hcloud-ccm.yaml
 
 hcloud-ccm.yaml:
 	curl -fsSL -o hcloud-ccm.yaml https://github.com/hetznercloud/hcloud-cloud-controller-manager/raw/master/deploy/ccm-networks.yaml
-	sed -i 's:10.244.0.0/16:{{ k8s_ip_range_pod }}:' hcloud-ccm.yaml
+	sed -i.bak 's:10.244.0.0/16:{{ k8s_ip_range_pod }}:' hcloud-ccm.yaml
+	rm hcloud-ccm.yaml.bak
 
 clean:
 	rm -f hcloud-ccm.yaml
