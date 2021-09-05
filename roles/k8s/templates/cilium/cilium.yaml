@@ -79,6 +79,8 @@ data:
   bpf-lb-map-max: "65536"
   # bpf-lb-bypass-fib-lookup instructs Cilium to enable the FIB lookup bypass
   # optimization for nodeport reverse NAT handling.
+  bpf-lb-external-clusterip: "false"
+
   # Pre-allocation of map entries allows per-packet latency to be reduced, at
   # the expense of up-front memory allocation for the entries in the maps. The
   # default value below will minimize memory usage in the default installation;
@@ -114,9 +116,6 @@ data:
   tunnel: disabled
   # Enables L7 proxy for L7 policy enforcement and visibility
   enable-l7-proxy: "true"
-
-  # wait-bpf-mount makes init container wait until bpf filesystem is mounted
-  wait-bpf-mount: "false"
 
   enable-ipv4-masquerade: "true"
   enable-ipv6-masquerade: "true"
@@ -447,7 +446,7 @@ spec:
             httpHeaders:
             - name: "brief"
               value: "true"
-          failureThreshold: 24
+          failureThreshold: 105
           periodSeconds: 2
           successThreshold: 1
         livenessProbe:
@@ -501,7 +500,7 @@ spec:
               key: custom-cni-conf
               name: cilium-config
               optional: true
-        image: "quay.io/cilium/cilium:v1.10.2@sha256:1112a29c8fe04c2a47e5e250112a940c9b81d6700b7e8bba159ab996a05282b9"
+        image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
         imagePullPolicy: IfNotPresent
         lifecycle:
           postStart:
@@ -553,18 +552,24 @@ spec:
         env:
           - name: CGROUP_ROOT
             value: /run/cilium/cgroupv2
+          - name: BIN_PATH
+            value: /opt/cni/bin
         command:
-          - nsenter
-          - --cgroup=/hostpid1ns/cgroup
-          - --mount=/hostpid1ns/mnt
-          - --
           - sh
           - -c
-          - 'mount | grep "$CGROUP_ROOT type cgroup2" || { echo "Mounting cgroup filesystem..."; mount -t cgroup2 none $CGROUP_ROOT; }'
-        image: "quay.io/cilium/cilium:v1.10.2@sha256:1112a29c8fe04c2a47e5e250112a940c9b81d6700b7e8bba159ab996a05282b9"
+          # The statically linked Go program binary is invoked to avoid any
+          # dependency on utilities like sh and mount that can be missing on certain
+          # distros installed on the underlying host. Copy the binary to the
+          # same directory where we install cilium cni plugin so that exec permissions
+          # are available.
+          - 'cp /usr/bin/cilium-mount /hostbin/cilium-mount && nsenter --cgroup=/hostproc/1/ns/cgroup --mount=/hostproc/1/ns/mnt "${BIN_PATH}/cilium-mount" $CGROUP_ROOT; rm /hostbin/cilium-mount'
+        image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
+        imagePullPolicy: IfNotPresent
         volumeMounts:
-          - mountPath: /hostpid1ns
-            name: host-proc-ns
+          - mountPath: /hostproc
+            name: hostproc
+          - mountPath: /hostbin
+            name: cni-path
         securityContext:
           privileged: true
       - command:
@@ -582,13 +587,7 @@ spec:
               key: clean-cilium-bpf-state
               name: cilium-config
               optional: true
-        - name: CILIUM_WAIT_BPF_MOUNT
-          valueFrom:
-            configMapKeyRef:
-              key: wait-bpf-mount
-              name: cilium-config
-              optional: true
-        image: "quay.io/cilium/cilium:v1.10.2@sha256:1112a29c8fe04c2a47e5e250112a940c9b81d6700b7e8bba159ab996a05282b9"
+        image: "quay.io/cilium/cilium:v1.10.4@sha256:7d354052ccf2a7445101d78cebd14444c7c40129ce7889f2f04b89374dbf8a1d"
         imagePullPolicy: IfNotPresent
         name: clean-cilium-state
         securityContext:
@@ -599,7 +598,6 @@ spec:
         volumeMounts:
         - mountPath: /sys/fs/bpf
           name: bpf-maps
-          mountPropagation: HostToContainer
           # Required to mount cgroup filesystem from the host to cilium agent pod
         - mountPath: /run/cilium/cgroupv2
           name: cilium-cgroup
@@ -630,9 +628,9 @@ spec:
         name: bpf-maps
       # To mount cgroup2 filesystem on the host
       - hostPath:
-          path: /proc/1/ns
+          path: /proc
           type: Directory
-        name: host-proc-ns
+        name: hostproc
       # To keep state between restarts / upgrades for cgroup2 filesystem
       - hostPath:
           path: /run/cilium/cgroupv2
@@ -745,7 +743,7 @@ spec:
               key: debug
               name: cilium-config
               optional: true
-        image: "quay.io/cilium/operator-generic:v1.10.2@sha256:a88b04cb5895610620da6e90d362af9e512d2baa51a0a0d77ab34186dfb20c68"
+        image: "quay.io/cilium/operator-generic:v1.10.4@sha256:c49a14e34634ff1a494c84b718641f27267fb3a0291ce3d74352b44f8a8d2f93"
         imagePullPolicy: IfNotPresent
         name: cilium-operator
         livenessProbe:
