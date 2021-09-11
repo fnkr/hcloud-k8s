@@ -7,10 +7,10 @@ init:
 	helm repo update
 
 cilium.yaml:
-	helm template cilium cilium/cilium --version 1.10.4 -n kube-system -f values.yaml | cat > cilium.yaml
+	helm template cilium cilium/cilium -n kube-system -f values.yaml | cat > cilium.yaml
 
 cilium-wireguard.yaml:
-	helm template cilium cilium/cilium --version 1.10.4 -n kube-system -f values.yaml -f values-ipsec.yaml | cat > cilium-wireguard.yaml
+	helm template cilium cilium/cilium -n kube-system -f values.yaml -f values-ipsec.yaml | cat > cilium-wireguard.yaml
 
 clean:
 	rm -f cilium.yaml cilium-wireguard.yaml
