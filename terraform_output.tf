@@ -95,6 +95,10 @@ output "controllb_ipv6_addresses" {
   value = length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer.controllb.*.ipv6 : hcloud_server.controlnode.*.ipv6_address
 }
 
+output "controllb_private_ipv4_addresses" {
+  value = length(hcloud_load_balancer.controllb) > 0 ? hcloud_load_balancer_network.controllb_network.*.ip : hcloud_server_network.controlnode_network.*.ip
+}
+
 output "controllb_k8s_endpoint" {
   value = "${length(hcloud_load_balancer.controllb) > 0 && !var.cluster_controllb_disable_public_network ? hcloud_load_balancer.controllb[0].ipv4 : hcloud_server.controlnode[0].ipv4_address}:${length(hcloud_load_balancer.controllb) > 0 && !var.cluster_controllb_disable_public_network ? hcloud_load_balancer_service.controllb_service_https[0].listen_port : 6443}"
 }
