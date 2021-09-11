@@ -141,15 +141,17 @@ it might be useful to connect through a proxy. The installation of such a proxy 
 
 The proxy would be located in the same internal network that the control node load balancer is in.
 The `kubeconfig.yaml` playbook (which is a helper playbook that updates your local kube config)
-supports this using the `KUBE_PROXY` environment variable.
+supports this using the `KUBE_PROXY` and `KUBE_INTERNAL` environment variables.
 
 If `KUBE_PROXY` is set, Kubernetes clients will be configured to make connections to the cluster
 through the specified proxy. If the option is used, the playbook will also extend the embedded trust store
 for this Kubernetes configuration with the current set of certificates present in your local trust store
 in order to make HTTPS proxies work.
 
+If `KUBE_INTERNAL` is set, internal (private) IP addresses of servers and load balancers will be used.
+
 ```
-KUBE_PROXY=https://user:token@proxy.example.com ansible-playbook kubeconfig.yaml
+KUBE_PROXY=https://user:token@proxy.example.com KUBE_INTERNAL=1 ansible-playbook kubeconfig.yaml
 ```
 
 ## Minimal cluster

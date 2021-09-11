@@ -120,6 +120,7 @@ def build_inventory(terraform_output):
         [
             terraform_output["controlnode_names"]["value"],
             terraform_output["controlnode_ipv4_addresses"]["value"],
+            terraform_output["controlnode_private_ipv4_addresses"]["value"],
             "controlnode",
             terraform_output["cluster_network_ip_range_controlnode_pod"]["value"],
             terraform_output["controlnode_instance_types"]["value"],
@@ -129,6 +130,7 @@ def build_inventory(terraform_output):
         [
             terraform_output["workernode_names"]["value"],
             terraform_output["workernode_ipv4_addresses"]["value"],
+            terraform_output["workernode_private_ipv4_addresses"]["value"],
             "workernode",
             terraform_output["cluster_network_ip_range_workernode_pod"]["value"],
             terraform_output["workernode_instance_types"]["value"],
@@ -139,14 +141,15 @@ def build_inventory(terraform_output):
         for node in range(len(group[0])):
             node_name = group[0][node]
             node_ipv4_address = group[1][node]
-            node_group = group[2]
-            node_pod_cidr = group[3][node] if group[3] else None
-            node_instance_type = group[4][node]
-            node_region = group[5][node]
-            node_zone = group[6][node]
+            node_private_ipv4_address = group[2][node]
+            node_group = group[3]
+            node_pod_cidr = group[4][node] if group[4] else None
+            node_instance_type = group[5][node]
+            node_region = group[6][node]
+            node_zone = group[7][node]
 
             inventory["_meta"]["hostvars"][node_name] = {
-                "ansible_host": node_ipv4_address,
+                "ansible_host": node_private_ipv4_address if os.environ.get('KUBE_INTERNAL') else node_ipv4_address,
                 "ansible_user": "root",
                 "k8s_private_control_plane_endpoint_ip": terraform_output[
                     f"controllb_private_k8s_endpoint_ips_for_{node_group}s"

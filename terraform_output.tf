@@ -27,8 +27,16 @@ output "controlnode_ipv4_addresses" {
   value = hcloud_server.controlnode.*.ipv4_address
 }
 
+output "controlnode_private_ipv4_addresses" {
+  value = hcloud_server_network.controlnode_network.*.ip
+}
+
 output "workernode_ipv4_addresses" {
   value = hcloud_server.workernode.*.ipv4_address
+}
+
+output "workernode_private_ipv4_addresses" {
+  value = hcloud_server_network.workernode_network.*.ip
 }
 
 output "controlnode_instance_types" {
