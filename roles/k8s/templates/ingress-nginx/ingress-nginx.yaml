@@ -33,6 +33,10 @@ data:
     
   hsts-max-age: "6.3072e+07"
     
+  proxy-buffer-size: "64k"
+    
+  proxy-buffers-number: "16"
+    
   use-proxy-protocol: "{{ 'true' if k8s_ingress_proxy_protocol else 'true' }}"
 ---
 # Source: ingress-nginx/templates/clusterrole.yaml
