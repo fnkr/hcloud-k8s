@@ -41,6 +41,17 @@ Each commit in the main branch is potentially breaking (might requires recreatin
 As soon as there is a stable version, it will be tagged `v1.0.0`.
 Tags should then be non-breaking until the next major version bump (`v2.0.0`).
 
+## Ansible
+
+It is recommended to use the Ansible version and packages from `requirements.txt`.
+
+```
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+. venv/bin/activate
+```
+
+
 ## Getting started
 
 **1)** Generate Read & Write API token
