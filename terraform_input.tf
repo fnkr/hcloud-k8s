@@ -77,7 +77,7 @@ variable "k8s_version_label_key" {
 
 variable "cluster_label_key" {
   type    = string
-  default = "k8s_cluster"
+  default = "cluster"
 }
 
 variable "role_label_key" {
