@@ -37,8 +37,6 @@ def build_inventory(terraform_output):
         },
     }
 
-    terraform_output = get_terraform_output()
-
     # fmt: off
     try:
         inventory["node"]["vars"]["k8s_hcloud_token"] = \
